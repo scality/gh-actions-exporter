@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "gh-actions-exporter"
+version = "0.1.0"
+description = ""
+authors = ["Release Engineering <release.engineering@scality.com>"]
+
+[tool.poetry.scripts]
+start = "gh_actions_exporter.main:start"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "^0.70.0"
+prometheus-client = "^0.12.0"
+uvicorn = {extras = ["standard"], version = "^0.15.0"}
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+flake8 = "^4.0.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
