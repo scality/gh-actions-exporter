@@ -18,3 +18,7 @@ jobs:
       run: poetry install
     - name: Lint project
       run: poetry run flake8
+    - uses: azure/setup-helm@v1
+      with:
+        version: v2.17.0
+    - run: helm lint ./charts/gh-action-exporter

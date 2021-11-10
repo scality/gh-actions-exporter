@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "gh-action-exporter.fullname" . }}
+  labels:
+    {{- include "gh-action-exporter.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - name: {{ include "gh-action-exporter.fullname" . }}
+      port: {{ .Values.service.port }}
+      targetPort: 8000
+      protocol: TCP
+  selector:
+    {{- include "gh-action-exporter.selectorLabels" . | nindent 4 }}
