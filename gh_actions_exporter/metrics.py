@@ -1,5 +1,5 @@
 import os
-import asyncio
+import datetime
 
 from prometheus_client import (CONTENT_TYPE_LATEST, REGISTRY,
                                CollectorRegistry, generate_latest)
@@ -80,8 +80,11 @@ class Metrics(object):
         ).state(status)
         return status
 
-    async def cleaner(self):
-        while True:
-            await asyncio.sleep(60)
-            # TODO: Clean metrics that have status=success or status=completed
-            # and updated_at >= 5 min
+    def cleaner(self):
+        def test(elem):
+            return (elem['status'] == 'completed'
+                    and datetime.timedelta(minutes=5) < datetime.datetime.now() - elem['update_at'])
+
+        for label in [elem for elem in self.workflow_status._samples() if test(elem)]:
+            self.workflow_status.remove(*label)
+            self.workflow_duration.remove(*label)

@@ -39,7 +39,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: "registry.scality.com/gh-action-exporter/gh-action-exporter:${{ github.event.inputs.tag }}"
+          tags: "registry.scality.com/gh-actions-exporter/gh-actions-exporter:${{ github.event.inputs.tag }}"
 
   create-git-release:
     runs-on: ubuntu-latest

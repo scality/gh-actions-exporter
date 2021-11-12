@@ -13,6 +13,7 @@ fastapi = "^0.70.0"
 prometheus-client = "^0.12.0"
 uvicorn = {extras = ["standard"], version = "^0.15.0"}
 python-multipart = "^0.0.5"
+fastapi-utils = "^0.2.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
