@@ -34,7 +34,6 @@ class Metrics(object):
             'status',
             'repo',
             'created_at',
-            'updated_at'
         ]
 
         self.workflow_status = Enum(
@@ -60,7 +59,6 @@ class Metrics(object):
                 status=status,
                 repo=webhook.repository.full_name,
                 created_at=webhook.workflow_run.created_at,
-                updated_at=webhook.workflow_run.updated_at
             ).set(duration)
 
     def set_status(self, webhook: WebHook) -> str:
@@ -76,7 +74,6 @@ class Metrics(object):
             status=webhook.workflow_run.status,
             repo=webhook.repository.full_name,
             created_at=webhook.workflow_run.created_at,
-            updated_at=webhook.workflow_run.updated_at
         ).state(status)
         return status
 
