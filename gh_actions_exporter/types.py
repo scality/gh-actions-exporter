@@ -15,7 +15,7 @@ class WorkflowRun(BaseModel):
     run_number: int
     head_branch: str
     created_at: datetime
-    updated_at: datetime or None
+    updated_at: Optional[datetime] = None
 
 
 class Repository(BaseModel):

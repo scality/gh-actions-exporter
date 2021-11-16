@@ -22,3 +22,8 @@ jobs:
       with:
         version: v2.17.0
     - run: helm lint ./charts/gh-action-exporter
+    - name: Run tests
+      run: poetry run pytest --cov=. --cov-report=xml
+    - name: Upload test coverage
+      uses: codecov/codecov-action@v2
+      if: always()

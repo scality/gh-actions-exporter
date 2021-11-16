@@ -34,6 +34,7 @@ class Metrics(object):
             'status',
             'repo',
             'created_at',
+            'finished_at'
         ]
 
         self.workflow_status = Enum(
@@ -59,13 +60,33 @@ class Metrics(object):
                 status=status,
                 repo=webhook.repository.full_name,
                 created_at=webhook.workflow_run.created_at,
+                finished_at=webhook.workflow_run.updated_at
             ).set(duration)
 
     def set_status(self, webhook: WebHook) -> str:
         if webhook.workflow_run.conclusion:
             status = webhook.workflow_run.conclusion
+            finished_at = webhook.workflow_run.updated_at
+            try:
+                # Remove old status to avoid duplicates
+                self.workflow_status.remove(
+                    webhook.workflow_run.name,
+                    webhook.workflow_run.workflow_id,
+                    webhook.workflow_run.head_sha,
+                    webhook.workflow_run.head_branch,
+                    # Previous status is queued
+                    "queued",
+                    webhook.repository.full_name,
+                    str(webhook.workflow_run.created_at),
+                    # finished_at set as none
+                    None
+                )
+            except KeyError:
+                print('metric does not exist in the registry')
+                pass
         else:
             status = webhook.workflow_run.status
+            finished_at = None
         self.workflow_status.labels(
             name=webhook.workflow_run.name,
             workflow_id=webhook.workflow_run.workflow_id,
@@ -74,14 +95,42 @@ class Metrics(object):
             status=webhook.workflow_run.status,
             repo=webhook.repository.full_name,
             created_at=webhook.workflow_run.created_at,
+            finished_at=finished_at
         ).state(status)
         return status
 
-    def cleaner(self):
-        def test(elem):
-            return (elem['status'] == 'completed'
-                    and datetime.timedelta(minutes=5) < datetime.datetime.now() - elem['update_at'])
+    def remove_completed_workflow(self):
+        """Stop exposing workflows that are completed."""
+        def can_delete_sample(sample):
+            """Returns True when sample can be deleted."""
+            labels = sample[1]
+            value = sample[2]
+            finished_at = datetime.datetime.fromisoformat(labels['finished_at'])
+            now = datetime.datetime.now(datetime.timezone.utc)
+            # Only get metrics where value is 1 as it reflects the current state
+            return (labels['status'] == 'completed' and value == 1
+                    and datetime.timedelta(minutes=5) < now - finished_at)
 
-        for label in [elem for elem in self.workflow_status._samples() if test(elem)]:
-            self.workflow_status.remove(*label)
-            self.workflow_duration.remove(*label)
+        for label in [sample[1] for sample in self.workflow_status._samples()
+                      if can_delete_sample(sample)]:
+            self.workflow_status.remove(
+                label['name'],
+                label['workflow_id'],
+                label['head_sha'],
+                label['head_branch'],
+                label['status'],
+                label['repo'],
+                label['created_at'],
+                label['finished_at'],
+            )
+            self.workflow_duration.remove(
+                label['name'],
+                label['workflow_id'],
+                label['head_sha'],
+                label['head_branch'],
+                # status in workflow duration is actually set as the state on workflow_status
+                label['github_actions_workflow_status'],
+                label['repo'],
+                label['created_at'],
+                label['finished_at'],
+            )
