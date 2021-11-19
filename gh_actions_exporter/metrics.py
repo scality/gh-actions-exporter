@@ -33,6 +33,7 @@ class Metrics(object):
             'head_branch',
             'status',
             'repo',
+            'run_number',
             'created_at',
         ]
 
@@ -58,6 +59,7 @@ class Metrics(object):
                 head_branch=webhook.workflow_run.head_branch,
                 status=status,
                 repo=webhook.repository.full_name,
+                run_number=webhook.workflow_run.run_number,
                 created_at=webhook.workflow_run.created_at,
             ).set(duration)
 
@@ -73,6 +75,7 @@ class Metrics(object):
             head_branch=webhook.workflow_run.head_branch,
             status=webhook.workflow_run.status,
             repo=webhook.repository.full_name,
+            run_number=webhook.workflow_run.run_number,
             created_at=webhook.workflow_run.created_at,
         ).state(status)
         return status
