@@ -4,7 +4,11 @@ EXPOSE 8000
 
 ENV POETRY_VERSION=1.1.11
 
-RUN pip install "poetry==$POETRY_VERSION"
+ENV PATH=$PATH:/root/.poetry/bin
+
+RUN apt-get update && apt-get install curl -y
+
+RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
 
 WORKDIR /app
 
