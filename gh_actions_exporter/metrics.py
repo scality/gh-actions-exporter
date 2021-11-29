@@ -79,6 +79,7 @@ class Metrics(object):
                     # Previous status is queued
                     "queued",
                     webhook.repository.full_name,
+                    webhook.workflow_run.run_number,
                     str(webhook.workflow_run.created_at),
                     # finished_at set as none
                     None
@@ -121,6 +122,7 @@ class Metrics(object):
                 label['workflow_id'],
                 label['head_sha'],
                 label['head_branch'],
+                label['run_number'],
                 label['status'],
                 label['repo'],
                 label['created_at'],
@@ -131,6 +133,7 @@ class Metrics(object):
                 label['workflow_id'],
                 label['head_sha'],
                 label['head_branch'],
+                label['run_number'],
                 # status in workflow duration is actually set as the state on workflow_status
                 label['github_actions_workflow_status'],
                 label['repo'],
