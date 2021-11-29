@@ -59,7 +59,7 @@ def test_metrics_endpoint(client, webhook, headers):
 
     metrics = client.get('/metrics')
     assert metrics.status_code == 200
-    assert str(webhook['workflow_run']['workflow_id']) in metrics.text
+    assert str(webhook['workflow_run']['id']) in metrics.text
 
 
 def test_metrics_transition_no_duplicate(client, webhook, headers):
@@ -101,7 +101,7 @@ def test_metrics_clean(client, webhook, headers):
     for i in range(10, 1):
         try:
             metrics = client.get('/metrics')
-            assert str(webhook['workflow_run']['workflow_id']) not in metrics.text
+            assert str(webhook['workflow_run']['id']) not in metrics.text
         except AssertionError as exp:
             if i == 10:
                 raise AssertionError(exp)
@@ -128,4 +128,4 @@ def test_unsupported_events(client, webhook, headers):
     headers['X-GitHub-Event'] = 'push'
     response = client.post('/webhook', json=webhook, headers=headers)
 
-    response.status_code == 202
+    assert response.status_code == 202
