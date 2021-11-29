@@ -13,9 +13,10 @@ metrics = Metrics()
 app.add_route('/metrics', prometheus_metrics)
 
 
+@app.on_event("startup")
 @repeat_every(seconds=10)
-def clean_status() -> None:
-    metrics.cleaner()
+def clean_completed_workflow() -> None:
+    metrics.remove_completed_workflow()
 
 
 @app.get("/", status_code=200)
@@ -26,7 +27,6 @@ def index():
 @app.post("/webhook", status_code=202)
 async def webhook(webhook: WebHook, request: Request):
     WebhookManager(payload=webhook, event=request.headers['X-Github-Event'], metrics=metrics)()
-    print([elem for elem in metrics.workflow_status._samples()])
     return "Accepted"
 
 
@@ -37,11 +37,11 @@ async def list_status():
 
 @app.delete("/status/removes")
 async def remove_old_status():
-    clean_status()
+    await clean_completed_workflow()
     return "Accepted"
 
 
-@app.get("/clear", status_code=200)
+@app.delete("/clear", status_code=200)
 async def clear():
     metrics.workflow_duration.clear()
     metrics.workflow_status.clear()

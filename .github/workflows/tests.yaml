@@ -14,6 +14,11 @@ jobs:
         python-version: '3.9'
     - name: install poetry
       run: pip install poetry
+    - name: Poetry deps cache
+      uses: actions/cache@v2
+      with:
+        path: "~/.cache/pypoetry"
+        key: poetry-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
     - name: Install dependencies
       run: poetry install
     - name: Lint project
@@ -22,3 +27,8 @@ jobs:
       with:
         version: v2.17.0
     - run: helm lint ./charts/gh-action-exporter
+    - name: Run tests
+      run: poetry run pytest --cov=. --cov-report=xml
+    - name: Upload test coverage
+      uses: codecov/codecov-action@v2
+      if: always()
