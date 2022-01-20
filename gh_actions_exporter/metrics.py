@@ -28,7 +28,7 @@ class Metrics(object):
     def __init__(self):
         self.labelnames = [
             'name',
-            'workflow_id',
+            'id',
             'head_sha',
             'head_branch',
             'status',
@@ -40,7 +40,7 @@ class Metrics(object):
 
         self.workflow_status = Enum(
             'github_actions_workflow_status', 'The state of a workflow',
-            states=['success', 'in_progress', 'queued', 'skipped', 'failure'],
+            states=['success', 'in_progress', 'queued', 'skipped', 'failure', 'cancelled'],
             labelnames=self.labelnames
         )
         self.workflow_duration = Gauge(
@@ -55,7 +55,7 @@ class Metrics(object):
                         - webhook.workflow_run.created_at.timestamp())
             self.workflow_duration.labels(
                 name=webhook.workflow_run.name,
-                workflow_id=webhook.workflow_run.workflow_id,
+                id=webhook.workflow_run.id,
                 head_sha=webhook.workflow_run.head_sha,
                 head_branch=webhook.workflow_run.head_branch,
                 status=status,
@@ -65,6 +65,25 @@ class Metrics(object):
                 finished_at=webhook.workflow_run.updated_at
             ).set(duration)
 
+    def set_status_running(self, run_id: int):
+        def is_my_workflow(sample):
+            labels = sample[1]
+            return str(labels['id']) == str(run_id) and labels['status'] != "in_progress"
+
+        for label in [sample[1] for sample in self.workflow_status._samples()
+                      if is_my_workflow(sample)]:
+            self.workflow_status.labels(
+                label['name'],
+                label['id'],
+                label['head_sha'],
+                label['head_branch'],
+                label['status'],
+                label['repo'],
+                label['run_number'],
+                label['created_at'],
+                label['finished_at'],
+            ).state('in_progress')
+
     def set_status(self, webhook: WebHook) -> str:
         if webhook.workflow_run.conclusion:
             status = webhook.workflow_run.conclusion
@@ -73,7 +92,7 @@ class Metrics(object):
                 # Remove old status to avoid duplicates
                 self.workflow_status.remove(
                     webhook.workflow_run.name,
-                    webhook.workflow_run.workflow_id,
+                    webhook.workflow_run.id,
                     webhook.workflow_run.head_sha,
                     webhook.workflow_run.head_branch,
                     # Previous status is queued
@@ -92,7 +111,7 @@ class Metrics(object):
             finished_at = None
         self.workflow_status.labels(
             name=webhook.workflow_run.name,
-            workflow_id=webhook.workflow_run.workflow_id,
+            id=webhook.workflow_run.id,
             head_sha=webhook.workflow_run.head_sha,
             head_branch=webhook.workflow_run.head_branch,
             status=webhook.workflow_run.status,
@@ -119,7 +138,7 @@ class Metrics(object):
                       if can_delete_sample(sample)]:
             self.workflow_status.remove(
                 label['name'],
-                label['workflow_id'],
+                label['id'],
                 label['head_sha'],
                 label['head_branch'],
                 label['run_number'],
@@ -130,7 +149,7 @@ class Metrics(object):
             )
             self.workflow_duration.remove(
                 label['name'],
-                label['workflow_id'],
+                label['id'],
                 label['head_sha'],
                 label['head_branch'],
                 label['run_number'],
