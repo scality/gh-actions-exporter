@@ -4,6 +4,15 @@ from typing import Optional
 from pydantic import BaseModel
 
 
+class Steps(BaseModel):
+    name: str
+    status: str
+    conclusion: Optional[str] = None
+    number: int
+    started_at: Optional[datetime] = None
+    completed_at: Optional[datetime] = None
+
+
 class WorkflowJob(BaseModel):
     id: int
     run_id: int
@@ -18,6 +27,8 @@ class WorkflowJob(BaseModel):
     started_at: datetime
     completed_at: Optional[datetime] = None
     name: str
+    labels: list[str]
+    steps: Optional[list[Steps]] = None
 
 
 class WorkflowRun(BaseModel):
@@ -32,14 +43,18 @@ class WorkflowRun(BaseModel):
     head_branch: str
     created_at: datetime
     updated_at: Optional[datetime] = None
+    run_attempt: int
+    run_started_at: Optional[datetime] = None
 
 
 class Repository(BaseModel):
     name: str
     full_name: str
+    visibility: str
 
 
 class WebHook(BaseModel):
     workflow_run: Optional[WorkflowRun] = None
     workflow_job: Optional[WorkflowJob] = None
-    repository: Repository
+    repository: Optional[Repository] = None
+    zen: Optional[str] = None
