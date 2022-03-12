@@ -1,5 +1,4 @@
 import os
-import datetime
 
 from prometheus_client import (CONTENT_TYPE_LATEST, REGISTRY,
                                CollectorRegistry, generate_latest)
@@ -7,7 +6,7 @@ from prometheus_client.multiprocess import MultiProcessCollector
 from fastapi.requests import Request
 from fastapi.responses import Response
 from gh_actions_exporter.types import WebHook
-from prometheus_client import Enum, Gauge
+from prometheus_client import Counter, Histogram
 
 
 def prometheus_metrics(request: Request) -> Response:
@@ -26,136 +25,168 @@ def prometheus_metrics(request: Request) -> Response:
 class Metrics(object):
 
     def __init__(self):
-        self.labelnames = [
-            'name',
-            'id',
-            'head_sha',
-            'head_branch',
-            'status',
-            'repo',
-            'run_number',
-            'created_at',
-            'finished_at'
+        self.workflow_labelnames = [
+            'repository',
+            'workflow_name',
+            'repository_visibility',
         ]
-
-        self.workflow_status = Enum(
-            'github_actions_workflow_status', 'The state of a workflow',
-            states=['success', 'in_progress', 'queued', 'skipped', 'failure', 'cancelled'],
-            labelnames=self.labelnames
+        self.job_labelnames = [
+            'repository',
+            'job_name',
+            'repository_visibility',
+            'runner_type'
+        ]
+        self.workflow_rebuild = Counter(
+            'github_actions_workflow_rebuild_count', 'The number of workflow rebuild',
+            labelnames=self.workflow_labelnames
         )
-        self.workflow_duration = Gauge(
+        self.workflow_duration = Histogram(
             'github_actions_workflow_duration_seconds',
             'The duration of a workflow in seconds',
-            labelnames=self.labelnames
+            labelnames=self.workflow_labelnames
+        )
+        self.job_duration = Histogram(
+            'github_actions_job_duration_seconds',
+            'The duration of a job in seconds',
+            labelnames=self.job_labelnames,
+        )
+        self.workflow_status_failure = Counter(
+            'github_actions_workflow_failure_count',
+            'Count the number of workflow failure',
+            labelnames=self.workflow_labelnames
+        )
+        self.workflow_status_success = Counter(
+            'github_actions_workflow_success_count',
+            'Count the number of workflow success',
+            labelnames=self.workflow_labelnames
+        )
+        self.workflow_status_cancelled = Counter(
+            'github_actions_workflow_cancelled_count',
+            'Count the number of workflow cancelled',
+            labelnames=self.workflow_labelnames
+        )
+        self.workflow_status_inprogress = Counter(
+            'github_actions_workflow_inprogress_count',
+            'Count the number of workflow in progress',
+            labelnames=self.workflow_labelnames
+        )
+        self.workflow_status_total = Counter(
+            'github_actions_workflow_total_count',
+            'Count the total number of workflows',
+            labelnames=self.workflow_labelnames
+        )
+        self.job_status_failure = Counter(
+            'github_actions_job_failure_count',
+            'Count the number of job failure',
+            labelnames=self.job_labelnames
+        )
+        self.job_status_success = Counter(
+            'github_actions_job_success_count',
+            'Count the number of job success',
+            labelnames=self.job_labelnames
+        )
+        self.job_status_cancelled = Counter(
+            'github_actions_job_cancelled_count',
+            'Count the number of job cancelled',
+            labelnames=self.job_labelnames
+        )
+        self.job_status_inprogress = Counter(
+            'github_actions_job_inprogress_count',
+            'Count the number of job in progress',
+            labelnames=self.job_labelnames
+        )
+        self.job_status_queued = Counter(
+            'github_actions_job_queued_count',
+            'Count the number of job queued',
+            labelnames=self.job_labelnames
+        )
+        self.job_status_total = Counter(
+            'github_actions_job_total_count',
+            'Count the total number of jobs',
+            labelnames=self.job_labelnames
+        )
+        self.job_start_duration = Histogram(
+            'github_actions_job_start_duration_seconds',
+            'Time between when a job is requested and started',
+            labelnames=self.job_labelnames
         )
 
-    def set_time(self, webhook: WebHook, status: str):
+    def workflow_labels(self, webhook: WebHook) -> dict:
+        return dict(
+            workflow_name=webhook.workflow_run.name,
+            repository=webhook.repository.full_name,
+            repository_visibility=webhook.repository.visibility,
+        )
+
+    def runner_type(self, webhook: WebHook) -> str:
+        if 'self-hosted' in webhook.workflow_job.labels:
+            return 'self-hosted'
+        return 'github-hosted'
+
+    def job_labels(self, webhook: WebHook) -> dict:
+        labels = dict(
+            runner_type=self.runner_type(webhook),
+            job_name=webhook.workflow_job.name,
+            repository_visibility=webhook.repository.visibility,
+            repository=webhook.repository.full_name,
+        )
+        return labels
+
+    def handle_workflow_rebuild(self, webhook: WebHook):
+        # playing safe counting rebuild when workflow is complete
+        # Ideally would like to find a trustworthy event to count
+        # when workflows starts but as far as I can remember we keep
+        # getting queued status multiple time for the same workflow
+        # and not always in_progress
+        labels = self.workflow_labels(webhook)
+        if (webhook.workflow_run.conclusion
+                and webhook.workflow_run.run_attempt > 1):
+            self.workflow_rebuild.labels(**labels).inc()
+
+    def handle_workflow_status(self, webhook: WebHook):
+        labels = self.workflow_labels(webhook)
         if webhook.workflow_run.conclusion:
+            if webhook.workflow_run.conclusion == 'success':
+                self.workflow_status_success.labels(**labels).inc()
+            elif webhook.workflow_run.conclusion == 'failure':
+                self.workflow_status_failure.labels(**labels).inc()
+            elif webhook.workflow_run.conclusion == 'cancelled':
+                self.workflow_status_cancelled.labels(**labels).inc()
+            self.workflow_status_total.labels(**labels).inc()
+        # Hoping that the in_progress status will actually be sent and
+        # only once
+        elif webhook.workflow_run.status == "in_progress":
+            self.workflow_status_inprogress.labels(**labels).inc()
+
+    def handle_workflow_duration(self, webhook: WebHook):
+        if webhook.workflow_run.conclusion:
+            labels = self.workflow_labels(webhook)
             duration = (webhook.workflow_run.updated_at.timestamp()
-                        - webhook.workflow_run.created_at.timestamp())
-            self.workflow_duration.labels(
-                name=webhook.workflow_run.name,
-                id=webhook.workflow_run.id,
-                head_sha=webhook.workflow_run.head_sha,
-                head_branch=webhook.workflow_run.head_branch,
-                status=status,
-                repo=webhook.repository.full_name,
-                run_number=webhook.workflow_run.run_number,
-                created_at=webhook.workflow_run.created_at,
-                finished_at=webhook.workflow_run.updated_at
-            ).set(duration)
+                        - webhook.workflow_run.run_started_at.timestamp())
+            self.workflow_duration.labels(**labels).observe(duration)
 
-    def set_status_running(self, run_id: int):
-        def is_my_workflow(sample):
-            labels = sample[1]
-            return str(labels['id']) == str(run_id) and labels['status'] != "in_progress"
+    def handle_job_status(self, webhook: WebHook):
+        labels = self.job_labels(webhook)
+        if webhook.workflow_job.conclusion:
+            if webhook.workflow_job.conclusion == 'success':
+                self.job_status_success.labels(**labels).inc()
+            elif webhook.workflow_job.conclusion == 'failure':
+                self.job_status_failure.labels(**labels).inc()
+            elif webhook.workflow_job.conclusion == 'cancelled':
+                self.job_status_cancelled.labels(**labels).inc()
+            self.job_status_total.labels(**labels).inc()
+        elif webhook.workflow_job.status == 'in_progress':
+            self.job_status_inprogress.labels(**labels).inc()
+        elif webhook.workflow_job.status == 'queued':
+            self.job_status_queued.labels(**labels).inc()
 
-        for label in [sample[1] for sample in self.workflow_status._samples()
-                      if is_my_workflow(sample)]:
-            self.workflow_status.labels(
-                label['name'],
-                label['id'],
-                label['head_sha'],
-                label['head_branch'],
-                label['status'],
-                label['repo'],
-                label['run_number'],
-                label['created_at'],
-                label['finished_at'],
-            ).state('in_progress')
-
-    def set_status(self, webhook: WebHook) -> str:
-        if webhook.workflow_run.conclusion:
-            status = webhook.workflow_run.conclusion
-            finished_at = webhook.workflow_run.updated_at
-            try:
-                # Remove old status to avoid duplicates
-                self.workflow_status.remove(
-                    webhook.workflow_run.name,
-                    webhook.workflow_run.id,
-                    webhook.workflow_run.head_sha,
-                    webhook.workflow_run.head_branch,
-                    # Previous status is queued
-                    "queued",
-                    webhook.repository.full_name,
-                    webhook.workflow_run.run_number,
-                    str(webhook.workflow_run.created_at),
-                    # finished_at set as none
-                    None
-                )
-            except KeyError:
-                print('metric does not exist in the registry')
-                pass
-        else:
-            status = webhook.workflow_run.status
-            finished_at = None
-        self.workflow_status.labels(
-            name=webhook.workflow_run.name,
-            id=webhook.workflow_run.id,
-            head_sha=webhook.workflow_run.head_sha,
-            head_branch=webhook.workflow_run.head_branch,
-            status=webhook.workflow_run.status,
-            repo=webhook.repository.full_name,
-            run_number=webhook.workflow_run.run_number,
-            created_at=webhook.workflow_run.created_at,
-            finished_at=finished_at
-        ).state(status)
-        return status
-
-    def remove_completed_workflow(self):
-        """Stop exposing workflows that are completed."""
-        def can_delete_sample(sample):
-            """Returns True when sample can be deleted."""
-            labels = sample[1]
-            value = sample[2]
-            finished_at = datetime.datetime.fromisoformat(labels['finished_at'])
-            now = datetime.datetime.now(datetime.timezone.utc)
-            # Only get metrics where value is 1 as it reflects the current state
-            return (labels['status'] == 'completed' and value == 1
-                    and datetime.timedelta(minutes=5) < now - finished_at)
-
-        for label in [sample[1] for sample in self.workflow_status._samples()
-                      if can_delete_sample(sample)]:
-            self.workflow_status.remove(
-                label['name'],
-                label['id'],
-                label['head_sha'],
-                label['head_branch'],
-                label['run_number'],
-                label['status'],
-                label['repo'],
-                label['created_at'],
-                label['finished_at'],
-            )
-            self.workflow_duration.remove(
-                label['name'],
-                label['id'],
-                label['head_sha'],
-                label['head_branch'],
-                label['run_number'],
-                # status in workflow duration is actually set as the state on workflow_status
-                label['github_actions_workflow_status'],
-                label['repo'],
-                label['created_at'],
-                label['finished_at'],
-            )
+    def handle_job_duration(self, webhook: WebHook):
+        labels = self.job_labels(webhook)
+        if webhook.workflow_job.conclusion:
+            duration = (webhook.workflow_job.completed_at.timestamp()
+                        - webhook.workflow_job.started_at.timestamp())
+            self.job_duration.labels(**labels).observe(duration)
+        elif webhook.workflow_job.status == "in_progress":
+            duration = (webhook.workflow_job.steps[0].completed_at.timestamp()
+                        - webhook.workflow_job.started_at.timestamp())
+            self.job_start_duration.labels(**labels).observe(duration)

@@ -1,7 +1,6 @@
 import uvicorn
 
 from fastapi import FastAPI, Request
-from fastapi_utils.tasks import repeat_every
 
 from gh_actions_exporter.metrics import prometheus_metrics, Metrics
 from gh_actions_exporter.types import WebHook
@@ -11,12 +10,6 @@ app = FastAPI()
 metrics = Metrics()
 
 app.add_route('/metrics', prometheus_metrics)
-
-
-@app.on_event("startup")
-@repeat_every(seconds=10)
-def clean_completed_workflow() -> None:
-    metrics.remove_completed_workflow()
 
 
 @app.get("/", status_code=200)
@@ -30,22 +23,23 @@ async def webhook(webhook: WebHook, request: Request):
     return "Accepted"
 
 
-@app.get("/status")
-async def list_status():
-    return [elem for elem in metrics.workflow_status._samples()]
-
-
-@app.delete("/status/removes")
-async def remove_old_status():
-    await clean_completed_workflow()
-    return "Accepted"
-
-
 @app.delete("/clear", status_code=200)
 async def clear():
+    metrics.workflow_rebuild.clear()
     metrics.workflow_duration.clear()
-    metrics.workflow_status.clear()
-    return "Clear"
+    metrics.job_duration.clear()
+    metrics.workflow_status_failure.clear()
+    metrics.workflow_status_success.clear()
+    metrics.workflow_status_cancelled.clear()
+    metrics.workflow_status_inprogress.clear()
+    metrics.workflow_status_total.clear()
+    metrics.job_status_failure.clear()
+    metrics.job_status_success.clear()
+    metrics.job_status_cancelled.clear()
+    metrics.job_status_inprogress.clear()
+    metrics.job_status_queued.clear()
+    metrics.job_status_total.clear()
+    metrics.job_start_duration.clear()
 
 
 def start():
