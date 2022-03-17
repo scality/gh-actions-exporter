@@ -10,6 +10,7 @@ on:
         description: "Is the release a prerelease ?"
         required: false
         default: false
+        type: boolean
 
 jobs:
   release-manager:
@@ -50,7 +51,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          target_commitish: ${{ github.sha }}
           tag_name: ${{ github.event.inputs.tag }}
-          release_name: Release ${{ github.event.inputs.tag }}
+          name: Release ${{ github.event.inputs.tag }}
           prerelease: ${{ github.event.inputs.prerelease }}
 

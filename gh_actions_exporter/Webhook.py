@@ -23,12 +23,13 @@ class WebhookManager(object):
             getattr(self, self.event)()
 
     def workflow_run(self):
-        status = self.metrics.set_status(self.payload)
-        self.metrics.set_time(self.payload, status)
+        self.metrics.handle_workflow_duration(self.payload)
+        self.metrics.handle_workflow_status(self.payload)
+        self.metrics.handle_workflow_rebuild(self.payload)
 
     def workflow_job(self):
-        if self.payload.workflow_job.status == 'in_progress':
-            self.metrics.set_status_running(self.payload.workflow_job.run_id)
+        self.metrics.handle_job_status(self.payload)
+        self.metrics.handle_job_duration(self.payload)
 
-    def ping(self, payload):
+    def ping(self):
         logger.info('Ping from Github')

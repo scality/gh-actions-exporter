@@ -1,8 +1,8 @@
-FROM python:3.9
+FROM python:3.10
 
 EXPOSE 8000
 
-ENV POETRY_VERSION=1.1.11
+ENV POETRY_VERSION=1.1.13
 
 ENV PATH=$PATH:/root/.poetry/bin
 
