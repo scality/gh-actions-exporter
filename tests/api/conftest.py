@@ -64,8 +64,8 @@ def workflow_job():
                     "status": "in_progress",
                     "conclusion": None,
                     "number": 1,
-                    "started_at": "2021-11-29T14:46:57Z",
-                    "completed_at": "2021-11-29T14:54:57Z"
+                    "started_at": "2021-11-29T14:50:57Z",
+                    "completed_at": None
                 }
             ],
             "labels": ["github-hosted"]
