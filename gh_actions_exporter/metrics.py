@@ -6,7 +6,7 @@ from prometheus_client.multiprocess import MultiProcessCollector
 from fastapi.requests import Request
 from fastapi.responses import Response
 from gh_actions_exporter.types import WebHook
-from prometheus_client import Counter, Histogram
+from prometheus_client import Counter, Gauge
 
 
 def prometheus_metrics(request: Request) -> Response:
@@ -40,12 +40,12 @@ class Metrics(object):
             'github_actions_workflow_rebuild_count', 'The number of workflow rebuild',
             labelnames=self.workflow_labelnames
         )
-        self.workflow_duration = Histogram(
+        self.workflow_duration = Gauge(
             'github_actions_workflow_duration_seconds',
             'The duration of a workflow in seconds',
             labelnames=self.workflow_labelnames
         )
-        self.job_duration = Histogram(
+        self.job_duration = Gauge(
             'github_actions_job_duration_seconds',
             'The duration of a job in seconds',
             labelnames=self.job_labelnames,
@@ -105,7 +105,7 @@ class Metrics(object):
             'Count the total number of jobs',
             labelnames=self.job_labelnames
         )
-        self.job_start_duration = Histogram(
+        self.job_start_duration = Gauge(
             'github_actions_job_start_duration_seconds',
             'Time between when a job is requested and started',
             labelnames=self.job_labelnames
@@ -163,7 +163,7 @@ class Metrics(object):
             labels = self.workflow_labels(webhook)
             duration = (webhook.workflow_run.updated_at.timestamp()
                         - webhook.workflow_run.run_started_at.timestamp())
-            self.workflow_duration.labels(**labels).observe(duration)
+            self.workflow_duration.labels(**labels).set(duration)
 
     def handle_job_status(self, webhook: WebHook):
         labels = self.job_labels(webhook)
@@ -185,8 +185,8 @@ class Metrics(object):
         if webhook.workflow_job.conclusion:
             duration = (webhook.workflow_job.completed_at.timestamp()
                         - webhook.workflow_job.started_at.timestamp())
-            self.job_duration.labels(**labels).observe(duration)
+            self.job_duration.labels(**labels).set(duration)
         elif webhook.workflow_job.status == "in_progress":
             duration = (webhook.workflow_job.steps[0].started_at.timestamp()
                         - webhook.workflow_job.started_at.timestamp())
-            self.job_start_duration.labels(**labels).observe(duration)
+            self.job_start_duration.labels(**labels).set(duration)
