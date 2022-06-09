@@ -24,7 +24,7 @@ def test_workflow_job_in_progress(client, workflow_job, headers):
         if 'inprogress_count_total{' in line:
             assert "1.0" in line
         if 'start_duration_seconds_sum{' in line:
-            assert '480.0' in line
+            assert '240.0' in line
 
 
 def test_workflow_job_label_self_hosted(client, workflow_job, headers):
@@ -56,4 +56,4 @@ def test_multiple_job_runs(client, workflow_job, headers):
         if 'job_total_count_total{' in line:
             assert '1.0' in line
         if 'job_start_duration_seconds_sum{' in line:
-            assert '480.0' in line
+            assert '240.0' in line
