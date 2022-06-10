@@ -3,9 +3,11 @@ import os
 from prometheus_client import (CONTENT_TYPE_LATEST, REGISTRY,
                                CollectorRegistry, generate_latest)
 from prometheus_client.multiprocess import MultiProcessCollector
+from typing import Dict, List
 from fastapi.requests import Request
 from fastapi.responses import Response
-from gh_actions_exporter.types import WebHook
+from gh_actions_exporter.config import Relabel, RelabelType, Settings
+from gh_actions_exporter.types import WebHook, WorkflowJob
 from prometheus_client import Counter, Histogram
 
 
@@ -23,8 +25,8 @@ def prometheus_metrics(request: Request) -> Response:
 
 
 class Metrics(object):
-
-    def __init__(self):
+    def __init__(self, settings: Settings):
+        self.settings = settings
         self.workflow_labelnames = [
             'repository',
             'workflow_name',
@@ -36,6 +38,9 @@ class Metrics(object):
             'repository_visibility',
             'runner_type'
         ]
+        for relabel in self.settings.job_relabelling:
+            self.job_labelnames.append(relabel.label)
+
         self.workflow_rebuild = Counter(
             'github_actions_workflow_rebuild_count', 'The number of workflow rebuild',
             labelnames=self.workflow_labelnames
@@ -123,13 +128,40 @@ class Metrics(object):
             return 'self-hosted'
         return 'github-hosted'
 
-    def job_labels(self, webhook: WebHook) -> dict:
+    def relabel_job_labels(self, relabel: Relabel, labels: List[str]) -> Dict[str, str or None]:
+        result = {
+            relabel.label: relabel.default
+        }
+        for label in relabel.values:
+            if label in labels:
+                result[relabel.label] = label
+        return result
+
+    def relabel_job_names(self, relabel: Relabel, job: WorkflowJob) -> dict:
+        if job.status == 'queued':
+            return dict()
+        result = {
+            relabel.label: relabel.default
+        }
+        for label in relabel.values:
+            print(job.runner_name)
+            print(label)
+            if label in job.runner_name:
+                result[relabel.label] = label
+        return result
+
+    def job_labels(self, webhook: WebHook, settings: Settings) -> dict:
         labels = dict(
             runner_type=self.runner_type(webhook),
             job_name=webhook.workflow_job.name,
             repository_visibility=webhook.repository.visibility,
             repository=webhook.repository.full_name,
         )
+        for relabel in settings.job_relabelling:
+            if relabel.type == RelabelType.label:
+                labels.update(self.relabel_job_labels(relabel, webhook.workflow_job.labels))
+            elif relabel.type == RelabelType.name:
+                labels.update(self.relabel_job_names(relabel, webhook.workflow_job))
         return labels
 
     def handle_workflow_rebuild(self, webhook: WebHook):
@@ -165,8 +197,8 @@ class Metrics(object):
                         - webhook.workflow_run.run_started_at.timestamp())
             self.workflow_duration.labels(**labels).observe(duration)
 
-    def handle_job_status(self, webhook: WebHook):
-        labels = self.job_labels(webhook)
+    def handle_job_status(self, webhook: WebHook, settings: Settings):
+        labels = self.job_labels(webhook, settings)
         if webhook.workflow_job.conclusion:
             if webhook.workflow_job.conclusion == 'success':
                 self.job_status_success.labels(**labels).inc()
@@ -180,8 +212,8 @@ class Metrics(object):
         elif webhook.workflow_job.status == 'queued':
             self.job_status_queued.labels(**labels).inc()
 
-    def handle_job_duration(self, webhook: WebHook):
-        labels = self.job_labels(webhook)
+    def handle_job_duration(self, webhook: WebHook, settings: Settings):
+        labels = self.job_labels(webhook, settings)
         if webhook.workflow_job.conclusion:
             duration = (webhook.workflow_job.completed_at.timestamp()
                         - webhook.workflow_job.started_at.timestamp())

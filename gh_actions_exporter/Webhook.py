@@ -1,4 +1,5 @@
 import logging
+from gh_actions_exporter.config import Settings
 from gh_actions_exporter.types import WebHook
 from gh_actions_exporter.metrics import Metrics
 
@@ -9,10 +10,11 @@ class WebhookManager(object):
     event: str
     payload: WebHook
 
-    def __init__(self, payload: WebHook, event: str, metrics: Metrics):
+    def __init__(self, payload: WebHook, event: str, metrics: Metrics, settings: Settings):
         self.event = event
         self.payload = payload
         self.metrics = metrics
+        self.settings = settings
 
     def __call__(self, *args, **kwargs):
         # Check if we managed this event
@@ -28,8 +30,8 @@ class WebhookManager(object):
         self.metrics.handle_workflow_rebuild(self.payload)
 
     def workflow_job(self):
-        self.metrics.handle_job_status(self.payload)
-        self.metrics.handle_job_duration(self.payload)
+        self.metrics.handle_job_status(self.payload, self.settings)
+        self.metrics.handle_job_duration(self.payload, self.settings)
 
     def ping(self):
         logger.info('Ping from Github')
