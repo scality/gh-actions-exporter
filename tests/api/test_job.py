@@ -57,3 +57,15 @@ def test_multiple_job_runs(client, workflow_job, headers):
             assert '1.0' in line
         if 'job_start_duration_seconds_sum{' in line:
             assert '240.0' in line
+
+
+def test_job_relabel(override_job_config, client, workflow_job, headers):
+    response = client.post('/webhook', json=workflow_job, headers=headers)
+    metrics = client.get('/metrics')
+    assert response.status_code == 202
+    result = False
+    for line in metrics.text.split('\n'):
+        if "cloud=\"github-hosted\"" in line:
+            result = True
+
+    assert result
