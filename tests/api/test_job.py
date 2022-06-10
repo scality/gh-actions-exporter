@@ -49,14 +49,20 @@ def test_multiple_job_runs(client, workflow_job, headers):
 
     metrics = client.get('/metrics')
     assert metrics.status_code == 200
+    result_duration_sum = False
+    result_total_count = False
+    result_start_job_duration = False
 
     for line in metrics.text.split('\n'):
         if 'job_duration_seconds_sum{' in line:
-            assert '780.0' in line
+            result_duration_sum = True
         if 'job_total_count_total{' in line:
-            assert '1.0' in line
+            result_total_count = True
         if 'job_start_duration_seconds_sum{' in line:
-            assert '240.0' in line
+            result_start_job_duration = True
+    assert result_duration_sum is True
+    assert result_total_count is True
+    assert result_start_job_duration is True
 
 
 def test_job_relabel(override_job_config, client, workflow_job, headers):

@@ -114,8 +114,8 @@ def workflow_job():
                     "status": "completed",
                     "conclusion": "success",
                     "number": 1,
-                    "started_at": "2021-11-29T14:50:57Z",
-                    "completed_at": None
+                    "started_at": "2021-11-29T14:46:57Z",
+                    "completed_at": "2021-11-29T14:55:57Z"
                 }
             ],
             "labels": ["ubuntu-latest"]
