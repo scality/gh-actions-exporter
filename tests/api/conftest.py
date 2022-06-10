@@ -1,15 +1,64 @@
+from functools import lru_cache
 import pytest
 from fastapi.testclient import TestClient
-from gh_actions_exporter.main import app
+from gh_actions_exporter.main import app, get_settings, metrics
+from gh_actions_exporter.metrics import Metrics
+from gh_actions_exporter.config import Relabel, Settings
+from prometheus_client import REGISTRY
+
+
+@lru_cache()
+def job_relabel_config():
+    return Settings(job_relabelling=[
+        Relabel(
+            label="cloud",
+            values=[
+                "mycloud"
+            ],
+            type="name",
+            default="github-hosted"
+        ),
+        Relabel(
+            label="image",
+            values=[
+                "ubuntu-latest"
+            ],
+        )
+    ])
+
+
+@lru_cache()
+def relabel_metrics():
+    return Metrics(job_relabel_config())
+
+
+def unregister_metrics():
+    print(f'Unregistering {REGISTRY._collector_to_names}')
+    for collector, names in tuple(REGISTRY._collector_to_names.items()):
+        if any(name.startswith('github_actions') for name in names):
+            REGISTRY.unregister(collector)
 
 
 @pytest.fixture(scope='function')
-def client():
-    client = TestClient(app)
+def override_job_config(fastapp):
+    unregister_metrics()
+    fastapp.dependency_overrides[get_settings] = job_relabel_config
+    fastapp.dependency_overrides[metrics] = relabel_metrics
+
+
+@pytest.fixture(scope='function', autouse=True)
+def fastapp():
+    fastapp = app
+    return fastapp
+
+
+@pytest.fixture(scope='function')
+def client(fastapp):
+    client = TestClient(fastapp)
     return client
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(scope='function', autouse=True)
 def destroy_client(client):
     client.delete('/clear')
 
@@ -58,17 +107,18 @@ def workflow_job():
             "started_at": "2021-11-29T14:46:57Z",
             "completed_at": None,
             "name": "greet (tata)",
+            "runner_name": "GitHub Actions 3",
             "steps": [
                 {
                     "name": "Set up job",
-                    "status": "in_progress",
-                    "conclusion": None,
+                    "status": "completed",
+                    "conclusion": "success",
                     "number": 1,
                     "started_at": "2021-11-29T14:50:57Z",
                     "completed_at": None
                 }
             ],
-            "labels": ["github-hosted"]
+            "labels": ["ubuntu-latest"]
         },
         "repository": {
             "name": "test-runner-operator",

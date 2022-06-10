@@ -1,13 +1,26 @@
 import uvicorn
 
-from fastapi import FastAPI, Request
+from fastapi import Depends, FastAPI, Request
+from functools import lru_cache
 
 from gh_actions_exporter.metrics import prometheus_metrics, Metrics
 from gh_actions_exporter.types import WebHook
 from gh_actions_exporter.Webhook import WebhookManager
+from gh_actions_exporter.config import Settings
+
+
+@lru_cache()
+def get_settings() -> Settings:
+    return Settings()
+
+
+@lru_cache()
+def metrics() -> Metrics:
+    return Metrics(get_settings())
+
 
 app = FastAPI()
-metrics = Metrics()
+
 
 app.add_route('/metrics', prometheus_metrics)
 
@@ -18,13 +31,23 @@ def index():
 
 
 @app.post("/webhook", status_code=202)
-async def webhook(webhook: WebHook, request: Request):
-    WebhookManager(payload=webhook, event=request.headers['X-Github-Event'], metrics=metrics)()
+async def webhook(
+    webhook: WebHook,
+    request: Request,
+    settings: Settings = Depends(get_settings),
+    metrics: Metrics = Depends(metrics)
+):
+    WebhookManager(
+        payload=webhook,
+        event=request.headers['X-Github-Event'],
+        metrics=metrics,
+        settings=settings
+    )()
     return "Accepted"
 
 
 @app.delete("/clear", status_code=200)
-async def clear():
+async def clear(metrics: Metrics = Depends(metrics)):
     metrics.workflow_rebuild.clear()
     metrics.workflow_duration.clear()
     metrics.job_duration.clear()
