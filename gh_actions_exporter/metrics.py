@@ -216,7 +216,7 @@ class Metrics(object):
             duration = (webhook.workflow_job.completed_at.timestamp()
                         - webhook.workflow_job.started_at.timestamp())
             self.job_duration.labels(**labels).observe(duration)
-        elif webhook.workflow_job.status == "in_progress":
-            duration = (webhook.workflow_job.steps[0].started_at.timestamp()
-                        - webhook.workflow_job.started_at.timestamp())
-            self.job_start_duration.labels(**labels).observe(duration)
+
+            start_duration = (webhook.workflow_job.steps[0].completed_at.timestamp()
+                              - webhook.workflow_job.started_at.timestamp())
+            self.job_start_duration.labels(**labels).observe(start_duration)
