@@ -138,14 +138,15 @@ class Metrics(object):
         return result
 
     def relabel_job_names(self, relabel: Relabel, job: WorkflowJob) -> dict:
-        if job.status == 'queued':
-            return dict()
         result = {
             relabel.label: relabel.default
         }
-        for label in relabel.values:
-            if label in job.runner_name:
-                result[relabel.label] = label
+        if job.status == 'queued':
+            result[relabel.label] = ""
+        else:
+            for label in relabel.values:
+                if label in job.runner_name:
+                    result[relabel.label] = label
         return result
 
     def job_labels(self, webhook: WebHook, settings: Settings) -> dict:
