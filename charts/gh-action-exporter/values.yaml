@@ -14,6 +14,10 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
+
+config:
+  job_relabelling: []
+
 serviceAccount:
   # Specifies whether a service account should be created
   create: true

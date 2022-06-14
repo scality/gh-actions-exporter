@@ -18,6 +18,7 @@ class WorkflowJob(BaseModel):
     run_id: int
     run_url: str
     run_attempt: int
+    runner_name: Optional[str] = None
     node_id: str
     head_sha: str
     url: str
