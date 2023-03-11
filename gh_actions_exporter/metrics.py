@@ -115,6 +115,12 @@ class Metrics(object):
             'Time between when a job is requested and started',
             labelnames=self.job_labelnames
         )
+        # Metrics to sum the cost of a job
+        self.job_cost = Counter(
+            'github_actions_job_cost_count',
+            'Cost of a job',
+            labelnames=self.job_labelnames
+        )
 
     def workflow_labels(self, webhook: WebHook) -> dict:
         return dict(
@@ -211,13 +217,28 @@ class Metrics(object):
         elif webhook.workflow_job.status == 'queued':
             self.job_status_queued.labels(**labels).inc()
 
+    def _get_job_duration(self, webhook: WebHook) -> float:
+        if webhook.workflow_job.conclusion:
+            return (webhook.workflow_job.completed_at.timestamp()
+                    - webhook.workflow_job.started_at.timestamp())
+        return 0
+
     def handle_job_duration(self, webhook: WebHook, settings: Settings):
         labels = self.job_labels(webhook, settings)
         if webhook.workflow_job.conclusion:
-            duration = (webhook.workflow_job.completed_at.timestamp()
-                        - webhook.workflow_job.started_at.timestamp())
+            duration = self._get_job_duration(webhook)
             self.job_duration.labels(**labels).observe(duration)
         elif webhook.workflow_job.status == "in_progress":
             duration = (webhook.workflow_job.steps[0].started_at.timestamp()
                         - webhook.workflow_job.started_at.timestamp())
             self.job_start_duration.labels(**labels).observe(duration)
+
+    def handle_job_cost(self, webhook: WebHook, settings: Settings):
+        labels = self.job_labels(webhook, settings)
+        # look for the flavor label
+        flavor = labels.get(settings.flavor_label, None)
+        cost_per_min = settings.job_costs.get(flavor, settings.default_cost)
+        if webhook.workflow_job.conclusion and cost_per_min:
+            duration = self._get_job_duration(webhook)
+            # Cost of runner is duration / 60 * cost_per_min
+            self.job_cost.labels(**labels).inc(duration / 60 * cost_per_min)

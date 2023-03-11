@@ -36,6 +36,15 @@ class ConfigFile(BaseSettings):
 
 class Settings(BaseSettings):
     job_relabelling: Optional[List[Relabel]] = []
+    job_costs: Optional[Dict[str, float]] = {
+        'medium': 0.008,
+        'large': 0.016,
+        'xlarge': 0.032,
+        '2xlarge': 0.064,
+        '3xlarge': 0.128
+    }
+    flavor_label: Optional[str] = 'flavor'
+    default_cost: Optional[float] = 0.008
 
     class Config:
         config: ConfigFile = ConfigFile()

@@ -32,6 +32,7 @@ class WebhookManager(object):
     def workflow_job(self):
         self.metrics.handle_job_status(self.payload, self.settings)
         self.metrics.handle_job_duration(self.payload, self.settings)
+        self.metrics.handle_job_cost(self.payload, self.settings)
 
     def ping(self):
         logger.info('Ping from Github')
