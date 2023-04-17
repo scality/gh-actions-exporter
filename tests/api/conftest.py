@@ -34,7 +34,7 @@ def job_relabel_config():
                 default="medium"
             )
         ],
-    ),
+    )
 
 
 @lru_cache()
