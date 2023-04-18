@@ -9,22 +9,33 @@ from prometheus_client import REGISTRY
 
 @lru_cache()
 def job_relabel_config():
-    return Settings(job_relabelling=[
-        Relabel(
-            label="cloud",
-            values=[
-                "mycloud"
-            ],
-            type="name",
-            default="github-hosted"
-        ),
-        Relabel(
-            label="image",
-            values=[
-                "ubuntu-latest"
-            ],
-        )
-    ])
+    return Settings(
+        job_relabelling=[
+            Relabel(
+                label="cloud",
+                values=[
+                    "mycloud"
+                ],
+                type="name",
+                default="github-hosted"
+            ),
+
+            Relabel(
+                label="image",
+                values=[
+                    "ubuntu-latest"
+                ],
+            ),
+
+            Relabel(
+                label="flavor",
+                values=[
+                    "large"
+                ],
+                default="medium"
+            )
+        ],
+    )
 
 
 @lru_cache()

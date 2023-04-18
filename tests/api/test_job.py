@@ -86,3 +86,20 @@ def test_job_relabel(override_job_config, client, workflow_job, headers):
         if "image=\"ubuntu-latest\"" in line:
             result = True
     assert result is True
+
+
+def test_job_cost(client, workflow_job, headers):
+    metrics = client.get('/metrics')
+    for line in metrics.text.split('\n'):
+        if 'github_actions_job_cost_count_total{' in line:
+            assert '0.0' in line
+
+    workflow_job['workflow_job']['conclusion'] = 'success'
+    workflow_job['workflow_job']['completed_at'] = '2021-11-29T14:59:57Z'
+    response = client.post('/webhook', json=workflow_job, headers=headers)
+    assert response.status_code == 202
+
+    metrics = client.get('/metrics')
+    for line in metrics.text.split('\n'):
+        if 'github_actions_job_cost_count_total{' in line:
+            assert '0.104' in line
