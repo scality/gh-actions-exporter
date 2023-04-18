@@ -102,4 +102,4 @@ def test_job_cost(client, workflow_job, headers):
     metrics = client.get('/metrics')
     for line in metrics.text.split('\n'):
         if 'github_actions_job_cost_count_total{' in line:
-            assert '0.0' not in line
+            assert '0.104' in line
