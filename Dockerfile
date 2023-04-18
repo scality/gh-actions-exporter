@@ -8,7 +8,7 @@ ENV PATH=$PATH:/root/.poetry/bin
 
 RUN apt-get update && apt-get install curl -y
 
-RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+RUN pip install "poetry==$POETRY_VERSION"
 
 WORKDIR /app
 
