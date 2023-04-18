@@ -1,0 +1,13 @@
+name: Docker build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  docker-build:
+    uses: scality/workflows/.github/workflows/docker-build.yaml@v1
+    with:
+      name: gh-actions-exporter
