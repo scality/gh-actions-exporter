@@ -19,6 +19,7 @@ def job_relabel_config():
                 type="name",
                 default="github-hosted"
             ),
+
             Relabel(
                 label="image",
                 values=[
