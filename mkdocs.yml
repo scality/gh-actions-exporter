@@ -37,21 +37,21 @@ theme:
     text: Roboto
     code: Roboto Mono
 
- nav:
- - Home: index.md
+nav:
+- Home: index.md
 
- markdown_extensions:
-   - pymdownx.highlight:
-       anchor_linenums: true
-   - pymdownx.emoji:
-       emoji_index: !!python/name:materialx.emoji.twemoji
-       emoji_generator: !!python/name:materialx.emoji.to_svg
-   - pymdownx.inlinehilite
-   - pymdownx.snippets
-   - pymdownx.superfences
-   - tables
-   - attr_list
-   - md_in_html
-   - meta
-   - admonition
-   - pymdownx.details
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - tables
+  - attr_list
+  - md_in_html
+  - meta
+  - admonition
+  - pymdownx.details
