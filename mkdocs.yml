@@ -2,9 +2,9 @@ site_name: Github Actions Exporter
 repo_url: https://github.com/scality/gh-actions-exporter
 repo_name: scality/gh-actions-exporter
 edit_uri: edit/main/docs/
- theme:
-   icon:
-     repo: fontawesome/brands/github
+theme:
+  icon:
+    repo: fontawesome/brands/github
   name: material
   include_search_page: false
   search_index_only: true
