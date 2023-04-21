@@ -1,0 +1,57 @@
+site_name: Github Actions Exporter
+repo_url: https://github.com/scality/gh-actions-exporter
+repo_name: scality/gh-actions-exporter
+edit_uri: edit/main/docs/
+theme:
+  icon:
+    repo: fontawesome/brands/github
+  name: material
+  include_search_page: false
+  search_index_only: true
+  language: en
+  features:
+    - navigation.indexes
+    - navigation.instant
+    - navigation.sections
+    - navigation.expand
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - search.highlight
+    - search.share
+    - search.suggest
+    - toc.follow
+    - header.autohide
+  palette:
+    # Palette toggle for light mode
+    - scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Roboto
+    code: Roboto Mono
+
+nav:
+- Home: index.md
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - tables
+  - attr_list
+  - md_in_html
+  - meta
+  - admonition
+  - pymdownx.details
