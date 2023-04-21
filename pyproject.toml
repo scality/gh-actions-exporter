@@ -18,7 +18,7 @@ PyYAML = "^6.0"
 [tool.poetry.group.docs]
 optional = true
 
-[tool.poetry.group.docs]
+[tool.poetry.group.docs.dependencies]
 mkdocs = "^1.4.2"
 mkdocs-material = "^9.1.6"
 mkdocs-multirepo-plugin = "^0.6.1"
