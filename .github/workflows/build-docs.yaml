@@ -19,5 +19,5 @@ jobs:
           pip install poetry
       - name: Install Dependencies
         run: |
-          poetry install
+          poetry install --with docs
       - run: mkdocs build --strict
