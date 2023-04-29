@@ -223,6 +223,12 @@ class Metrics(object):
                     - webhook.workflow_job.started_at.timestamp())
         return 0
 
+    def _get_workflow_duration(self, webhook: WebHook) -> float:
+        if webhook.workflow_run.conclusion:
+            return (webhook.workflow_run.completed_at.timestamp()
+                    - webhook.workflow_run.started_at.timestamp())
+        return 0
+
     def handle_job_duration(self, webhook: WebHook, settings: Settings):
         labels = self.job_labels(webhook, settings)
         if webhook.workflow_job.conclusion:
@@ -242,3 +248,12 @@ class Metrics(object):
             duration = self._get_job_duration(webhook)
             # Cost of runner is duration / 60 * cost_per_min
             self.job_cost.labels(**labels).inc(duration / 60 * cost_per_min)
+
+    def display_cost(self, webhook: WebHook, settings: Settings):
+        labels = self.job_labels(webhook, settings)
+        # look for the flavor label
+        flavor = labels.get(settings.flavor_label, None)
+        cost_per_min = settings.job_costs.get(flavor, settings.default_cost)
+        if webhook.workflow_run.conclusion and cost_per_min:
+            duration = self._get_workflow_duration(webhook)
+            cost = duration / 60 * cost_per_min
