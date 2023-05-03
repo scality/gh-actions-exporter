@@ -1,4 +1,5 @@
 import os
+import requests
 
 from prometheus_client import (CONTENT_TYPE_LATEST, REGISTRY,
                                CollectorRegistry, generate_latest)
@@ -9,6 +10,8 @@ from fastapi.responses import Response
 from gh_actions_exporter.config import Relabel, RelabelType, Settings
 from gh_actions_exporter.types import WebHook, WorkflowJob
 from prometheus_client import Counter, Histogram
+from gh_actions_exporter.jwtGenerator import JWTGenerator
+from github import Github, Repository
 
 
 def prometheus_metrics(request: Request) -> Response:
@@ -249,11 +252,102 @@ class Metrics(object):
             # Cost of runner is duration / 60 * cost_per_min
             self.job_cost.labels(**labels).inc(duration / 60 * cost_per_min)
 
-    def display_cost(self, webhook: WebHook, settings: Settings):
-        labels = self.job_labels(webhook, settings)
-        # look for the flavor label
+    def relabel_job_names_dict(self, relabel: Relabel, job_request: dict) -> dict:
+        result: dict = {
+            relabel.label: relabel.default
+        }
+        if job_request["status"] == 'queued':
+            result[relabel.label] = ""
+        else:
+            for label in relabel.values:
+                if label in job_request["runner_name"]:
+                    result[relabel.label] = label
+        return result
+
+    def runner_type_job(self, job_request: dict) -> str:
+        if 'self-hosted' in job_request["labels"]:
+            return 'self-hosted'
+        return 'github-hosted'
+
+    def job_request_labels(self, job_request: dict, webhook: WebHook, settings: Settings) -> dict:
+        labels: dict = dict(
+            runner_type=self.runner_type_job(job_request),
+            job_name=job_request["name"],
+            repository_visibility=webhook.workflow_run.repository.private,
+            repository=webhook.workflow_run.repository.full_name,
+        )
+        for relabel in settings.job_relabelling:
+            if relabel.type == RelabelType.label:
+                labels.update(self.relabel_job_labels(relabel, job_request["labels"]))
+            elif relabel.type == RelabelType.name:
+                labels.update(self.relabel_job_names_dict(relabel, job_request))
+        return labels
+
+    def _get_job_cost(self, job_request: dict, webhook: WebHook, settings: Settings) -> float:
+        labels: dict = self.job_request_labels(job_request, webhook, settings)
         flavor = labels.get(settings.flavor_label, None)
-        cost_per_min = settings.job_costs.get(flavor, settings.default_cost)
-        if webhook.workflow_run.conclusion and cost_per_min:
-            duration = self._get_workflow_duration(webhook)
-            cost = duration / 60 * cost_per_min
+        cost_per_min: float = settings.job_costs.get(flavor, settings.default_cost)
+        duration: float = (job_request["completed_at"].timestamp()
+                    - job_request["started_at"].timestamp())
+
+        return duration / 60 * cost_per_min
+
+    def get_previous_check_run(self, headers: dict, webhook: WebHook):
+        url: str = f'https://api.github.com/repos/{webhook.repository.full_name}/commits/{webhook.workflow_run.head_sha}/check-runs'
+        response: dict = requests.get(url, headers=headers).json()
+
+        for check_run in response["check_runs"]:
+            if check_run["name"] == "Workflow Costs":
+                return check_run["output"]["summary"]
+        return ""
+
+    def upload_check_run(self, summary: str, webhook: WebHook):
+        repo: Repository = g.get_repo(webhook.repository.full_name)
+
+        repo.create_check_run(
+            name="Cost",
+            head_sha=webhook.workflow_run.head_sha,
+            status="completed",
+            conclusion="success",
+            output={
+                "title": "Workflow Costs",
+                "summary": summary
+            }
+        )
+
+    def display_cost(self, webhook: WebHook, settings: Settings):
+        if webhook.workflow_run.conclusion:
+            jwt_generator: JWTGenerator = JWTGenerator()
+            jwt_token: bytes = jwt_generator.generate_jwt()
+
+            headers: dict = {
+                'Accept': 'application/vnd.github+json',
+                'Authorization': f'Bearer {jwt_token}',
+                'X-GitHub-Api-Version': '2022-11-28'
+            }
+
+            access_token_url: str = f'https://api.github.com/app/installations/{os.environ.get("INSTALLATION_ID", "")}/access_tokens'
+            response: dict = requests.post(access_token_url, headers=headers)
+            access_token: str = response.json()['token']
+
+            url: str = f'https://api.github.com/repos/{webhook.repository.full_name}/actions/runs/{webhook.workflow_run.id}/jobs'
+            response: dict = requests.get(url, headers=headers).json()
+
+            total_cost: float = 0.0
+            jobs_cost: dict = {}
+            for job in response["jobs"]:
+                cost: float = self._get_job_cost(job_request, webhook, request)
+                jobs_cost[job["name"]] = cost
+                total_cost += job_cost
+
+            summary: str = get_previous_check_run(headers, webhook)
+
+            if summary == "":
+                summary = """Behind a CI run, there are servers running which cost money, so it
+                    is important to be careful not to abuse this feature to avoid wasting money."""
+            summary += "## [" + webhook.workflow_run.name + "](" + webhook.workflow_run.html_url + ")\n"
+            for name, cost in jobs_cost.items():
+                summary += "* " + name + ": $" + cost + "\n"
+            summary += "Total: $" + total_cost + "\n"
+
+            upload_check_run(summary, webhook)
