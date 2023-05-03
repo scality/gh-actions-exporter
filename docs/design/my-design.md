@@ -329,7 +329,7 @@ Python Get Method :
 import os
 from github import Github
 
-token: str = 'ghs_8Ab7UrNtJbPQZ3agFvLPM7BUuA8fJP0cLdw7'
+token: str = 'ghs_XXXXXX'
 g: Github = Github(login_or_token=token)
 
 def get_check_run():
