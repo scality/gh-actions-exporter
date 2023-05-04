@@ -3,7 +3,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 
-from pydantic import BaseModel, BaseSettings
+from pydantic import BaseModel, BaseSettings, SecretStr
 
 
 def yaml_config_settings_source(settings: BaseSettings) -> Dict[str, Any]:
@@ -45,6 +45,12 @@ class Settings(BaseSettings):
     }
     flavor_label: Optional[str] = 'flavor'
     default_cost: Optional[float] = 0.008
+    github_app_private_pem: SecretStr # Checker
+    github_app_id: int
+    github_app_installation_id: int
+    title: str = "Workflow Costs"
+    summary: str = """Behind a CI run, there are servers running which cost money, so it
+                    is important to be careful not to abuse this feature to avoid wasting money."""
 
     class Config:
         config: ConfigFile = ConfigFile()

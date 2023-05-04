@@ -59,3 +59,7 @@ class WebHook(BaseModel):
     workflow_job: Optional[WorkflowJob] = None
     repository: Optional[Repository] = None
     zen: Optional[str] = None
+
+class JobCost(BaseModel):
+    name: str
+    cost: int

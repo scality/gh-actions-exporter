@@ -7,6 +7,7 @@ from gh_actions_exporter.metrics import prometheus_metrics, Metrics
 from gh_actions_exporter.types import WebHook
 from gh_actions_exporter.Webhook import WebhookManager
 from gh_actions_exporter.config import Settings
+from gh_actions_exporter.cost import Cost
 
 
 @lru_cache()
@@ -17,6 +18,11 @@ def get_settings() -> Settings:
 @lru_cache()
 def metrics() -> Metrics:
     return Metrics(get_settings())
+
+
+@lru_cache()
+def cost() -> Cost:
+    return Cost(get_settings())
 
 
 app = FastAPI()
@@ -35,13 +41,15 @@ async def webhook(
     webhook: WebHook,
     request: Request,
     settings: Settings = Depends(get_settings),
-    metrics: Metrics = Depends(metrics)
+    metrics: Metrics = Depends(metrics),
+    cost: Cost = Depends(cost)
 ):
     WebhookManager(
         payload=webhook,
         event=request.headers['X-Github-Event'],
         metrics=metrics,
-        settings=settings
+        settings=settings,
+        cost=cost
     )()
     return "Accepted"
 

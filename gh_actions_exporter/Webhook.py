@@ -2,6 +2,7 @@ import logging
 from gh_actions_exporter.config import Settings
 from gh_actions_exporter.types import WebHook
 from gh_actions_exporter.metrics import Metrics
+from gh_actions_exporter.cost import Cost
 
 logger = logging.getLogger("runner_manager")
 
@@ -10,11 +11,12 @@ class WebhookManager(object):
     event: str
     payload: WebHook
 
-    def __init__(self, payload: WebHook, event: str, metrics: Metrics, settings: Settings):
+    def __init__(self, payload: WebHook, event: str, metrics: Metrics, settings: Settings, cost: Cost):
         self.event = event
         self.payload = payload
         self.metrics = metrics
         self.settings = settings
+        self.cost = cost
 
     def __call__(self, *args, **kwargs):
         # Check if we managed this event
@@ -28,8 +30,7 @@ class WebhookManager(object):
         self.metrics.handle_workflow_duration(self.payload)
         self.metrics.handle_workflow_status(self.payload)
         self.metrics.handle_workflow_rebuild(self.payload)
-
-        self.metrics.display_cost(self.payload)
+        self.cost.display_cost(self.payload) # Checker les noms, changer de fichiers (autre que metrics)
 
     def workflow_job(self):
         self.metrics.handle_job_status(self.payload, self.settings)
