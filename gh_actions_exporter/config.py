@@ -45,7 +45,7 @@ class Settings(BaseSettings):
     }
     flavor_label: Optional[str] = 'flavor'
     default_cost: Optional[float] = 0.008
-    github_app_private_pem: SecretStr # Checker
+    github_app_private_pem: SecretStr
     github_app_id: int
     github_app_installation_id: int
     title: str = "Workflow Costs"

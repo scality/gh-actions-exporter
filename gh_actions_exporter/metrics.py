@@ -10,8 +10,6 @@ from fastapi.responses import Response
 from gh_actions_exporter.config import Relabel, RelabelType, Settings
 from gh_actions_exporter.types import WebHook, WorkflowJob
 from prometheus_client import Counter, Histogram
-from gh_actions_exporter.tokenGenerator import JWTGenerator
-from github import Github, Repository
 
 
 def prometheus_metrics(request: Request) -> Response:
@@ -224,12 +222,6 @@ class Metrics(object):
         if webhook.workflow_job.conclusion:
             return (webhook.workflow_job.completed_at.timestamp()
                     - webhook.workflow_job.started_at.timestamp())
-        return 0
-
-    def _get_workflow_duration(self, webhook: WebHook) -> float:
-        if webhook.workflow_run.conclusion:
-            return (webhook.workflow_run.completed_at.timestamp()
-                    - webhook.workflow_run.started_at.timestamp())
         return 0
 
     def handle_job_duration(self, webhook: WebHook, settings: Settings):

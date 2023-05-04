@@ -30,7 +30,7 @@ class WebhookManager(object):
         self.metrics.handle_workflow_duration(self.payload)
         self.metrics.handle_workflow_status(self.payload)
         self.metrics.handle_workflow_rebuild(self.payload)
-        self.cost.display_cost(self.payload) # Checker les noms, changer de fichiers (autre que metrics)
+        self.cost.display_cost(self.payload)
 
     def workflow_job(self):
         self.metrics.handle_job_status(self.payload, self.settings)
