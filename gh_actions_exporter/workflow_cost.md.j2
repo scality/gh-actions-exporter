@@ -1,0 +1,6 @@
+{% if summary == "" %}
+{{ settings.summary }}
+{% endif %}
+## [{{ workflow_run.name }}]({{ workflow_run.html_url }})
+{% for job_cost in jobs_cost %}* {{ job_cost.name }}: ${{ job_cost.cost }}
+{% endfor %}Total: ${{ total_cost }}

@@ -63,3 +63,10 @@ class WebHook(BaseModel):
 class JobCost(BaseModel):
     name: str
     cost: int
+
+class CheckRunData(BaseModel):
+    summary: str
+    settings: dict
+    workflow_run: dict
+    jobs_cost: list[dict]
+    total_cost: float

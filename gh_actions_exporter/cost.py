@@ -1,8 +1,8 @@
 import jinja2
 
 from typing import Dict, List
-from gh_actions_exporter.config import Relabel, RelabelType, Settings
-from gh_actions_exporter.types import WebHook, JobCost
+from gh_actions_exporter.config import Settings
+from gh_actions_exporter.types import WebHook, JobCost, WorkflowJob, CheckRunData
 from gh_actions_exporter.tokenGenerator import TokenGenerator
 from github import Github, Repository
 
@@ -10,15 +10,15 @@ class Cost(object):
     def __init__(self, settings: Settings):
         self.settings: Settings = settings 
 
-    def _runner_type_job(self, job_request: dict) -> str:
-        if 'self-hosted' in job_request["labels"]:
+    def _runner_type_job(self, job_request: WorkflowJob) -> str:
+        if 'self-hosted' in job_request.labels:
             return 'self-hosted'
         return 'github-hosted'
 
-    def _get_job_cost(self, job_request: dict, flavor_label: str) -> float:
+    def _get_job_cost(self, job_request: WorkflowJob, flavor_label: str) -> float:
         cost_per_min: float = self.settings.job_costs.get(flavor_label, self.settings.default_cost)
-        duration: float = (job_request["completed_at"].timestamp()
-                    - job_request["started_at"].timestamp())
+        duration: float = (job_request.completed_at.timestamp()
+                    - job_request.started_at.timestamp())
 
         if self._runner_type_job(job_request) == "github-hosted":
             return duration / 60 * self.settings.default_cost
@@ -31,15 +31,15 @@ class Cost(object):
         workflow_jobs: dict = repository._requester.requestJsonAndCheck("GET", self._get_workflow_jobs_url(webhook), {"Accept": "application/vnd.github.v3+json",})[1]
         return workflow_jobs
 
-    def _generate_check_run_data(self, webhook: WebHook, total_cost: float, jobs_cost: List[JobCost], summary: str) -> dict:
-        data: dict = {
+    def _generate_check_run_data(self, webhook: WebHook, total_cost: float, jobs_cost: List[JobCost], summary: str) -> CheckRunData:
+        check_run_data = CheckRunData({
             "summary": summary,
             "settings": {"summary": self.settings.summary},
-            "workflow_run": {"name": webhook.workflow_run.name, "html_url": webhook.workflow_run.html_url},
+            "workflow_run": webhook.workflow_run,
             "jobs_cost": jobs_cost,
             "total_cost": total_cost,
-        }
-        return data
+        })
+        return check_run_data
 
     def _get_previous_check_run(self, repository: Repository, webhook: WebHook) -> str:
         url: str = f"/repos/{webhook.repository.full_name}/commits/{webhook.workflow_run.head_sha}/check-runs"
@@ -65,9 +65,8 @@ class Cost(object):
     def display_cost(self, webhook: WebHook):
         if webhook.workflow_run.conclusion:
             token_generator: TokenGenerator = TokenGenerator(self.settings)
-            access_token: str = token_generator.generate_token()
+            g: Github = token_generator.generate_token()
 
-            g: Github = Github(access_token)
             repository: Repository = g.get_repo(webhook.repository.full_name)
             workflow_jobs: dict = self._get_workflow_jobs(webhook, repository)
 
@@ -86,15 +85,10 @@ class Cost(object):
 
             summary: str = self._get_previous_check_run(repository, webhook)
 
-            data: dict = self._generate_check_run_data(webhook, total_cost, jobs_cost, summary)
-            template = jinja2.Template(
-                """{% if summary == "" %}
-                {{ settings.summary }}
-                {% endif %}
-                ## [{{ workflow_run.name }}]({{ workflow_run.html_url }})
-                {% for job_cost in jobs_cost %}* {{ job_cost.name }}: ${{ job_cost.cost }}
-                {% endfor %}Total: ${{ total_cost }}"""
-            )
-
+            with open('workflow_cost.md.j2', 'r', encoding='utf-8') as template_file:
+                template_content = template_file.read()
+            data: CheckRunData = self._generate_check_run_data(webhook, total_cost, jobs_cost, summary)
+            template = jinja2.Template(template_content)
             result: str = template.render(data)
+            
             self._upload_check_run(result, repository, webhook)

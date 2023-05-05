@@ -38,8 +38,6 @@ class ConfigFile(BaseSettings):
 
 
 class Settings(BaseSettings):
-    load_dotenv()
-
     job_relabelling: Optional[List[Relabel]] = []
     job_costs: Optional[Dict[str, float]] = {
         'medium': 0.008,
@@ -54,10 +52,9 @@ class Settings(BaseSettings):
     #display_statistics: bool = True
     # -> Pas fou finalement (sinon mettre ça partout dans les tests de `test_workflow`)
 
-    #github_app_private_pem: SecretStr = os.getenv('GITHUB_APP_PRIVATE_PEM', '')
-    github_app_id: int = int(os.getenv('GITHUB_APP_ID', '0'))
-    github_app_installation_id: int = int(os.getenv('GITHUB_APP_INSTALLATION_ID', '0'))
-    github_app_private_pem: SecretStr = str(os.getenv('GITHUB_APP_PRIVATE_PEM', '0'))
+    github_app_id: int
+    github_app_installation_id: int
+    github_app_private_key: SecretStr
 
     title: str = "Workflow Costs"
     summary: str = """Behind a CI run, there are servers running which cost money, so it
@@ -65,6 +62,8 @@ class Settings(BaseSettings):
 
     class Config:
         config: ConfigFile = ConfigFile()
+        env_file = '.env'
+        env_file_encoding = 'utf-8'
 
         @classmethod
         def customise_sources(
