@@ -54,10 +54,15 @@ class Repository(BaseModel):
     visibility: str
 
 
+class Organization(BaseModel):
+    login: str
+
+
 class WebHook(BaseModel):
     workflow_run: Optional[WorkflowRun] = None
     workflow_job: Optional[WorkflowJob] = None
     repository: Optional[Repository] = None
+    organization: Optional[Organization] = None
     zen: Optional[str] = None
 
 class JobCost(BaseModel):
