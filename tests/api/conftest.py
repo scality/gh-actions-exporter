@@ -94,7 +94,7 @@ def workflow_run():
         },
         "repository": {
             "name": "repo",
-            "full_name": "org/repo",
+            "full_name": "scalanga-devl/runners-test",
             "visibility": "private",
         }
     }
