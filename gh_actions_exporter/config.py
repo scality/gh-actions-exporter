@@ -49,9 +49,8 @@ class Settings(BaseSettings):
     flavor_label: Optional[str] = 'flavor'
     default_cost: Optional[float] = 0.008
 
-    #display_statistics: bool = True
-    # -> Pas fou finalement (sinon mettre ça partout dans les tests de `test_workflow`)
-
+    exporter_enabled: bool = True
+    check_runs_enabled: bool = True
     github_app_id: int
     github_app_installation_id: int
     github_app_private_key: SecretStr

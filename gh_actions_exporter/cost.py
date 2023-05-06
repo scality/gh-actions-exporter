@@ -1,5 +1,6 @@
 import jinja2
 
+from datetime import datetime
 from typing import Dict, List
 from gh_actions_exporter.config import Settings
 from gh_actions_exporter.types import WebHook, JobCost, WorkflowJob, CheckRunData
@@ -11,14 +12,14 @@ class Cost(object):
         self.settings: Settings = settings 
 
     def _runner_type_job(self, job_request: WorkflowJob) -> str:
-        if 'self-hosted' in job_request.labels:
+        if 'self-hosted' in job_request["labels"]:
             return 'self-hosted'
         return 'github-hosted'
 
     def _get_job_cost(self, job_request: WorkflowJob, flavor_label: str) -> float:
         cost_per_min: float = self.settings.job_costs.get(flavor_label, self.settings.default_cost)
-        duration: float = (job_request.completed_at.timestamp()
-                    - job_request.started_at.timestamp())
+        duration: float = (datetime.fromisoformat(job_request["completed_at"].replace('Z', '+00:00')).timestamp()
+                    - datetime.fromisoformat(job_request["started_at"].replace('Z', '+00:00')).timestamp())
 
         if self._runner_type_job(job_request) == "github-hosted":
             return duration / 60 * self.settings.default_cost
@@ -29,17 +30,17 @@ class Cost(object):
         return workflow_jobs
 
     def _generate_check_run_data(self, webhook: WebHook, total_cost: float, jobs_cost: List[JobCost], summary: str) -> CheckRunData:
-        check_run_data = CheckRunData({
-            "summary": summary,
-            "settings": {"summary": self.settings.summary},
-            "workflow_run": webhook.workflow_run,
-            "jobs_cost": jobs_cost,
-            "total_cost": total_cost,
-        })
+        check_run_data = CheckRunData(
+            summary=summary,
+            settings={"summary": self.settings.summary},
+            workflow_run=webhook.workflow_run,
+            jobs_cost=jobs_cost,
+            total_cost=total_cost
+        )
         return check_run_data
 
     def _get_previous_check_run(self, g: GitHub, webhook: WebHook) -> str:
-        check_runs: dict = g.rest.checks.list_for_ref(webhook.organization.login, webhook.repository.name, webhook.workflow_run.head_sha).json()
+        check_runs: dict = g.rest.checks.list_for_ref(webhook.organization.login, webhook.repository.name, "546c86cb55726fd1e647b9a886c0c5ee63ca0718").json() # À changer
 
         for check_run in check_runs["check_runs"]:
             if check_run["name"] == self.settings.title and check_run["app"]["id"] == self.settings.github_app_id:
@@ -49,7 +50,7 @@ class Cost(object):
     def _upload_check_run(self, summary: str, g: GitHub, webhook: WebHook) -> None:
         data = {
             "name": "Cost",
-            "head_sha": webhook.workflow_run.head_sha,
+            "head_sha": "546c86cb55726fd1e647b9a886c0c5ee63ca0718", # À changer - webhook.workflow_run.head_sha
             "status": "completed",
             "conclusion": "success",
             "output": {
@@ -74,7 +75,7 @@ class Cost(object):
                 for label in job["labels"]:
                     if label in self.settings.job_costs:
                         flavor_label = label
-                        
+
                 cost: float = self._get_job_cost(job, flavor_label)
                 jobs_cost.append(JobCost(name=job["name"], cost=cost))
                 total_cost += cost

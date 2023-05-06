@@ -19,6 +19,7 @@ class WorkflowJob(BaseModel):
     run_url: str
     run_attempt: int
     runner_name: Optional[str] = None
+    head_sha: Optional[str] = None
     node_id: str
     head_sha: str
     url: str
@@ -37,6 +38,7 @@ class WorkflowRun(BaseModel):
     name: str
     event: str
     status: str
+    head_sha: Optional[str] = None
     conclusion: Optional[str] = None
     head_sha: str
     workflow_id: int

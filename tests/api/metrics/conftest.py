@@ -37,6 +37,13 @@ def job_relabel_config():
         ],
     )
 
+@lru_cache()
+def default_settings():
+    """Default configuration"""
+    return Settings(
+        check_runs_enabled=False
+    )
+
 
 @lru_cache()
 def relabel_metrics():
@@ -60,6 +67,7 @@ def override_job_config(fastapp):
 @pytest.fixture(scope='function', autouse=True)
 def fastapp():
     fastapp = app
+    fastapp.dependency_overrides[get_settings] = default_settings
     return fastapp
 
 
@@ -78,7 +86,7 @@ def destroy_client(client):
 def workflow_run():
     webhook = {
         "workflow_run": {
-            "id": 1468134741,
+            "id": 4863423668,
             "name": "test",
             "head_branch": "feature",
             "head_sha": "9dc4cd1747922994dc5249b866d3b1f37f09357d",
@@ -93,9 +101,12 @@ def workflow_run():
             "updated_at": "2021-11-16T17:53:32Z",
         },
         "repository": {
-            "name": "repo",
+            "name": "runners-test",
             "full_name": "scalanga-devl/runners-test",
             "visibility": "private",
+        },
+        "organization": {
+            "login": "scalanga-devl"
         }
     }
     return webhook
