@@ -1,10 +1,12 @@
 from functools import lru_cache
+
 import pytest
 from fastapi.testclient import TestClient
+from prometheus_client import REGISTRY
+
+from gh_actions_exporter.config import Relabel, Settings
 from gh_actions_exporter.main import app, get_settings, metrics
 from gh_actions_exporter.metrics import Metrics
-from gh_actions_exporter.config import Relabel, Settings
-from prometheus_client import REGISTRY
 
 
 @lru_cache()
@@ -12,30 +14,16 @@ def job_relabel_config():
     return Settings(
         job_relabelling=[
             Relabel(
-                label="cloud",
-                values=[
-                    "mycloud"
-                ],
-                type="name",
-                default="github-hosted"
+                label="cloud", values=["mycloud"], type="name", default="github-hosted"
             ),
-
             Relabel(
                 label="image",
-                values=[
-                    "ubuntu-latest"
-                ],
+                values=["ubuntu-latest"],
             ),
-
-            Relabel(
-                label="flavor",
-                values=[
-                    "large"
-                ],
-                default="medium"
-            )
+            Relabel(label="flavor", values=["large"], default="medium"),
         ],
     )
+
 
 @lru_cache()
 def relabel_metrics():
@@ -43,34 +31,34 @@ def relabel_metrics():
 
 
 def unregister_metrics():
-    print(f'Unregistering {REGISTRY._collector_to_names}')
+    print(f"Unregistering {REGISTRY._collector_to_names}")
     for collector, names in tuple(REGISTRY._collector_to_names.items()):
-        if any(name.startswith('github_actions') for name in names):
+        if any(name.startswith("github_actions") for name in names):
             REGISTRY.unregister(collector)
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def override_job_config(fastapp):
     unregister_metrics()
     fastapp.dependency_overrides[get_settings] = job_relabel_config
     fastapp.dependency_overrides[metrics] = relabel_metrics
 
 
-@pytest.fixture(scope='function', autouse=True)
+@pytest.fixture(scope="function", autouse=True)
 def fastapp():
     fastapp = app
     return fastapp
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def client(fastapp):
     client = TestClient(fastapp)
     return client
 
 
-@pytest.fixture(scope='function', autouse=True)
+@pytest.fixture(scope="function", autouse=True)
 def destroy_client(client):
-    client.delete('/clear')
+    client.delete("/clear")
 
 
 @pytest.fixture
@@ -96,9 +84,7 @@ def workflow_run():
             "full_name": "scalanga-devl/runners-test",
             "visibility": "private",
         },
-        "organization": {
-            "login": "scalanga-devl"
-        }
+        "organization": {"login": "scalanga-devl"},
     }
     return webhook
 
@@ -128,15 +114,15 @@ def workflow_job():
                     "conclusion": "success",
                     "number": 1,
                     "started_at": "2021-11-29T14:50:57Z",
-                    "completed_at": None
+                    "completed_at": None,
                 }
             ],
-            "labels": ["ubuntu-latest"]
+            "labels": ["ubuntu-latest"],
         },
         "repository": {
             "name": "test-runner-operator",
             "full_name": "scalanga-devl/test-runner-operator",
             "visibility": "private",
-        }
+        },
     }
     return webhook

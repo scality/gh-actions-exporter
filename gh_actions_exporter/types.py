@@ -1,6 +1,6 @@
-
 from datetime import datetime
 from typing import Optional
+
 from pydantic import BaseModel
 
 
@@ -66,9 +66,11 @@ class WebHook(BaseModel):
     organization: Optional[Organization] = None
     zen: Optional[str] = None
 
+
 class JobCost(BaseModel):
     name: str
     cost: int
+
 
 class CheckRunData(BaseModel):
     summary: str

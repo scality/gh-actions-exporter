@@ -1,12 +1,12 @@
 - J'arrive pas à trouver comment afficher qqch dans l'onglet `Check` de la PR,
-en mode comme avec CodeQL ... Sachant que CodeQL n'upload que des SARIF, donc
-je vois pas comment faire (il y a peut-être une solution, je vais creuser)
+  en mode comme avec CodeQL ... Sachant que CodeQL n'upload que des SARIF, donc
+  je vois pas comment faire (il y a peut-être une solution, je vais creuser)
 
 - En attendant, il y a la solution de créer un commentaire à chaque fois qu'il
-y a un trigger de CI au niveau de la PR.
-**Problème 1** : plein de commentaires dans tous les sens -> Chiant, donc il
-faut ajouter des lignes de code pour supprimer et recréer un commentaire (ou
-le modifier)
+  y a un trigger de CI au niveau de la PR.
+  **Problème 1** : plein de commentaires dans tous les sens -> Chiant, donc il
+  faut ajouter des lignes de code pour supprimer et recréer un commentaire (ou
+  le modifier)
 
 ```yaml
 - name: Add comment to PR
@@ -31,47 +31,42 @@ with:
 ```
 
 - En fait on a pas forcément besoin d'utiliser Prometheus. Le truc c'est que si
-on utilise Prometheus, faudrait l'appeler à la fin du run et pas au début ou
-pendant, sinon Prometheus ne sera pas à jour. Donc pour ça 2 options :
-    - On utilise Prometheus ainsi que des Webhooks, pour qu'à chaque fin de run
-    ça appelle un programme qui met un commentaire en place sur la PR avec le coût
-    que cela à engendré (j'ai pas encore vérifié la faisabilité)
+  on utilise Prometheus, faudrait l'appeler à la fin du run et pas au début ou
+  pendant, sinon Prometheus ne sera pas à jour. Donc pour ça 2 options : - On utilise Prometheus ainsi que des Webhooks, pour qu'à chaque fin de run
+  ça appelle un programme qui met un commentaire en place sur la PR avec le coût
+  que cela à engendré (j'ai pas encore vérifié la faisabilité)
 
-    - On récupère la config qu'il y a et on fait le calcul nous-mêmes (c'est pas
-    si ouf mais ça a l'air plus simple comme ça) -> Mais trop trop chiant parce
-    que ça veut dire rajouter à chaque workflow ça, c'est relou
+      - On récupère la config qu'il y a et on fait le calcul nous-mêmes (c'est pas
+      si ouf mais ça a l'air plus simple comme ça) -> Mais trop trop chiant parce
+      que ça veut dire rajouter à chaque workflow ça, c'est relou
 
-- Meilleur option : 
-    1. Webhook GitHub qui trigger une application tierce lorsqu'un Workflow de CI
-    se finit -> `workflow_run` et `workflow_job`
-    2. Le Webhook se déclenche à chaque fois qu'un `workflow_run` est complété
-    3. Envoie une POST request à notre URL (avec plein d'info)
-    4. Faire un script pour récupérer cette POST request avec toutes les infos,
-       en déduire le coût grâce aux nouvelles data de Prometheus (auquel on
-       fait un appel)
-    5. Avec les infos récupérées précédemment grâce à la POST request, en déduire
-       la PR correspondante :
-        - Si commentaire pas présent : le créer et mettre que le dernier run a coûté
-          tant
-        - Si commentaire déjà présent : le modifier pour ajouter le coût du dernier
-          run tout en gardant les coûts des précédents (en gros récupérer le contenu
-          du commentaire et y ajouter une nouvelle dépense en bas). À voir pour calculer
-          le total également
-
+- Meilleur option :
+  1. Webhook GitHub qui trigger une application tierce lorsqu'un Workflow de CI
+     se finit -> `workflow_run` et `workflow_job`
+  2. Le Webhook se déclenche à chaque fois qu'un `workflow_run` est complété
+  3. Envoie une POST request à notre URL (avec plein d'info)
+  4. Faire un script pour récupérer cette POST request avec toutes les infos,
+     en déduire le coût grâce aux nouvelles data de Prometheus (auquel on
+     fait un appel)
+  5. Avec les infos récupérées précédemment grâce à la POST request, en déduire
+     la PR correspondante :
+     - Si commentaire pas présent : le créer et mettre que le dernier run a coûté
+       tant
+     - Si commentaire déjà présent : le modifier pour ajouter le coût du dernier
+       run tout en gardant les coûts des précédents (en gros récupérer le contenu
+       du commentaire et y ajouter une nouvelle dépense en bas). À voir pour calculer
+       le total également
 
 check_suite et check_run
 Rien rajouté dans le workflow
 On crée juste un webhook au niveau de l'organisation pour tout gérer
 
-
-
-
 1. Webhook au niveau de l'org Scality avec appel workflow -> `workflow_run` et `workflow_job`
-(prendre le même webhook que Prometheus) -> OK
-2. L'algo de la facture se déclenche à chaque fois qu'un `workflow_run` est complété -> 
+   (prendre le même webhook que Prometheus) -> OK
+2. L'algo de la facture se déclenche à chaque fois qu'un `workflow_run` est complété ->
 
 > GET à GitHub pour récupérer les `check_runs` / `workflow_job` ... qui appartiennent aux
-`workflow_run` reçu. Possible que ça se fasse avec cette API mais à voir
+> `workflow_run` reçu. Possible que ça se fasse avec cette API mais à voir
 > Tu calcules le coût de ce `workflow_run`
 > Checker si y'a déjà un ticket de caisse
 > Soit en créer un, y mettre le prix + total (même chose du coup) du run
@@ -79,31 +74,32 @@ On crée juste un webhook au niveau de l'organisation pour tout gérer
 > Tu balances le `string` que t'a dans l'onglet `check` de GitHub (maybe aussi en commentaire)
 > avec une requête qui tape sur Github -> Request POST
 
-
 Étape 1a: List check runs for a Git reference
 $ gh api \
-  -H "Accept: application/vnd.github+json" \
-  -H "X-GitHub-Api-Version: 2022-11-28" \
-  /repos/scalanga-devl/runners-test/commits/4a43b9a/check-runs
+ -H "Accept: application/vnd.github+json" \
+ -H "X-GitHub-Api-Version: 2022-11-28" \
+ /repos/scalanga-devl/runners-test/commits/4a43b9a/check-runs
+
 > check_runs[0].id = 11681039521
 
 Étape 1b: Get a check run
 $ gh api \
-  -H "Accept: application/vnd.github+json" \
-  -H "X-GitHub-Api-Version: 2022-11-28" \
-  /repos/scalanga-devl/runners-test/check-runs/11681039521
+ -H "Accept: application/vnd.github+json" \
+ -H "X-GitHub-Api-Version: 2022-11-28" \
+ /repos/scalanga-devl/runners-test/check-runs/11681039521
+
 > Fais la même chose mais avec juste un check-run et pas tous
 
 ~ curl -L \
-  -X POST \
-  -H "Accept: application/vnd.github+json" \
-  -H "Authorization: Bearer ghp_XXXXXX"\
-  -H "X-GitHub-Api-Version: 2022-11-28" \
-  https://api.github.com/repos/scalanga-devl/runners-test/check-runs \
-  -d '{"name":"mighty_readme","head_sha":"008a6959532321fb621712cca91b875ef896f75d","status":"in_progress","external_id":"42","started_at":"2018-05-04T01:14:52Z","output":{"title":"Mighty Readme report","summary":"","text":""}}'
+ -X POST \
+ -H "Accept: application/vnd.github+json" \
+ -H "Authorization: Bearer ghp_XXXXXX"\
+ -H "X-GitHub-Api-Version: 2022-11-28" \
+ https://api.github.com/repos/scalanga-devl/runners-test/check-runs \
+ -d '{"name":"mighty_readme","head_sha":"008a6959532321fb621712cca91b875ef896f75d","status":"in_progress","external_id":"42","started_at":"2018-05-04T01:14:52Z","output":{"title":"Mighty Readme report","summary":"","text":""}}'
 {
-  "message": "You must authenticate via a GitHub App.",
-  "documentation_url": "https://docs.github.com/rest/reference/checks#create-a-check-run"
+"message": "You must authenticate via a GitHub App.",
+"documentation_url": "https://docs.github.com/rest/reference/checks#create-a-check-run"
 }
 
 ```bash
@@ -115,6 +111,7 @@ gh api \
 -F name="mighty_readme" \
 -F head_sha="008a6959532321fb621712cca91b875ef896f75d"
 ```
+
 -> Erreur
 
 ```bash
@@ -177,6 +174,7 @@ print(f"JWT:  {encoded_jwt}")
 --header "Authorization: Bearer XXXXX(giga long, jwt token)" \
 --header "X-GitHub-Api-Version: 2022-11-28"
 ```
+
 -> Then we're getting a token : ghs_XXX
 
 ```bash
@@ -188,16 +186,8 @@ curl -L \
   https://api.github.com/repos/scalanga-devl/runners-test/check-suites \
   -d '{"head_sha":"4a43b9ab28360192129a6c7ff192b921b22f8837"}'
 ```
+
 -> It works !!!
-
-
-
-
-
-
-
-
-
 
 ```bash
 ~ python3 test.py
@@ -213,6 +203,7 @@ JWT:  XXXXXXX
 --header "Authorization: Bearer XXXX" \
 --header "X-GitHub-Api-Version: 2022-11-28"
 ```
+
 -> token = ghs_XXXX
 
 ```bash
@@ -224,10 +215,10 @@ curl -L \
 https://api.github.com/repos/scalanga-devl/runners-test/check-runs \
 -d '{"name":"test3","head_sha":"4a43b9ab28360192129a6c7ff192b921b22f8837","status":"queued","external_id":"42","started_at":"2018-05-04T01:14:52Z","output":{"title":"Mighty Readme report","summary":"","text":""}}'
 ```
+
 -> It's works
 (It create a check-suites by itself)
 (If you give the same name it will delete the past one a create a new one)
-
 
 ```bash
 curl -L \
@@ -236,6 +227,7 @@ curl -L \
 -H "X-GitHub-Api-Version: 2022-11-28" \
 https://api.github.com/repos/scalanga-devl/runners-test/check-runs/13157937534
 ```
+
 -> output.text = "1st CI run: 20.43$.\n2nd CI run: 19.54$."
 
 Take this and do :
@@ -254,6 +246,7 @@ https://api.github.com/repos/scalanga-devl/runners-test/check-runs \
 ```
 
 What we need :
+
 - `"head_sha":"4a43b9ab28360192129a6c7ff192b921b22f8837"`
 - `text`
 - Bearer token
@@ -264,6 +257,7 @@ What we need :
 `View more details on check-suites` -> À voir comment le modifier ou l'enlever !
 
 JS Code that works :
+
 ```javascript
 const { Octokit } = require("@octokit/rest");
 
@@ -297,6 +291,7 @@ const createCheck = async () => {
 ```
 
 Python Code that works :
+
 ```py
 import os
 from github import Github
@@ -325,6 +320,7 @@ create_check()
 ```
 
 Python Get Method :
+
 ```py
 import os
 from github import Github
@@ -343,8 +339,6 @@ def get_check_run():
 get_check_run()
 ```
 
-
-
 # Simulation
 
 ## Step 1: Get the JWT token
@@ -353,8 +347,8 @@ get_check_run()
 Enter path of private PEM file: Downloads/check-suites.2023-05-01.private-key.pem
 Enter your APP ID: 326408
 ```
--> JWT:  XXXXXXXXXXXXXXX
 
+-> JWT: XXXXXXXXXXXXXXX
 
 ## Step 2: Get the bearer token
 
@@ -365,8 +359,8 @@ curl --request POST \
 --header "Authorization: Bearer XXXXXXXXX" \
 --header "X-GitHub-Api-Version: 2022-11-28"
 ```
--> ghs_XXXXXXX
 
+-> ghs_XXXXXXX
 
 ## Step 3a: When a workflow is triggered and mark as `workflow_run.completed`, check if the check_run is already created
 
@@ -376,11 +370,10 @@ gh api \
   -H "X-GitHub-Api-Version: 2022-11-28" \
   /repos/scalanga-devl/runners-test/commits/063eec46348ff57a9982e70dfdb312c4262962bd/check-runs?check_name=Cost
 ```
+
 **(Problem with the `check_name` parameter)**
 
-
 ## Step 3b: If the check-runs already exist, get the `output.test` variable and store it
-
 
 ## Step 4: Create / Modify the check-run "Cost"
 
@@ -414,12 +407,11 @@ def create_check():
 create_check()
 ```
 
-
-
 ```bash
 gh api \
   -H "Accept: application/vnd.github+json" \
   -H "X-GitHub-Api-Version: 2022-11-28" \
   /repos/scalanga-devl/runners-test/actions/runs/4863427856/jobs
 ```
+
 -> Pour lister les `workflow_job` à partir d'un `workflow_run`
