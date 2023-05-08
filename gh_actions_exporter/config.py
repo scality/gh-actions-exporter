@@ -1,10 +1,8 @@
-import os
 from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import yaml
-from dotenv import load_dotenv
 from pydantic import BaseModel, BaseSettings, SecretStr
 
 
@@ -55,8 +53,9 @@ class Settings(BaseSettings):
     github_app_private_key: SecretStr
 
     title: str = "Workflow Costs"
-    summary: str = """Behind a CI run, there are servers running which cost money, so it
-                    is important to be careful not to abuse this feature to avoid wasting money."""
+    summary: str = """Behind a CI run, there are servers running which
+                    cost money, so it is important to be careful not to
+                    abuse this feature to avoid wasting money."""
 
     class Config:
         config: ConfigFile = ConfigFile()

@@ -1,7 +1,4 @@
-import time
-
 from githubkit import AppInstallationAuthStrategy, GitHub
-
 from gh_actions_exporter.config import Settings
 
 
