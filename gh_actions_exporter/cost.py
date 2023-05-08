@@ -40,7 +40,7 @@ class Cost(object):
         return check_run_data
 
     def _get_previous_check_run(self, g: GitHub, webhook: WebHook) -> str:
-        check_runs: dict = g.rest.checks.list_for_ref(webhook.organization.login, webhook.repository.name, "546c86cb55726fd1e647b9a886c0c5ee63ca0718").json() # À changer
+        check_runs: dict = g.rest.checks.list_for_ref(webhook.organization.login, webhook.repository.name, webhook.workflow_run.head_sha).json()
 
         for check_run in check_runs["check_runs"]:
             if check_run["name"] == self.settings.title and check_run["app"]["id"] == self.settings.github_app_id:
@@ -50,7 +50,7 @@ class Cost(object):
     def _upload_check_run(self, summary: str, g: GitHub, webhook: WebHook) -> None:
         data = {
             "name": "Cost",
-            "head_sha": "546c86cb55726fd1e647b9a886c0c5ee63ca0718", # À changer - webhook.workflow_run.head_sha
+            "head_sha": webhook.workflow_run.head_sha,
             "status": "completed",
             "conclusion": "success",
             "output": {

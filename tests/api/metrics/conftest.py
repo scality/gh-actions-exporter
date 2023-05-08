@@ -38,14 +38,6 @@ def job_relabel_config():
     )
 
 @lru_cache()
-def default_settings():
-    """Default configuration"""
-    return Settings(
-        check_runs_enabled=False
-    )
-
-
-@lru_cache()
 def relabel_metrics():
     return Metrics(job_relabel_config())
 
@@ -67,7 +59,6 @@ def override_job_config(fastapp):
 @pytest.fixture(scope='function', autouse=True)
 def fastapp():
     fastapp = app
-    fastapp.dependency_overrides[get_settings] = default_settings
     return fastapp
 
 
@@ -89,7 +80,7 @@ def workflow_run():
             "id": 4863423668,
             "name": "test",
             "head_branch": "feature",
-            "head_sha": "9dc4cd1747922994dc5249b866d3b1f37f09357d",
+            "head_sha": "546c86cb55726fd1e647b9a886c0c5ee63ca0718",
             "run_number": 42,
             "run_attempt": 1,
             "event": "push",

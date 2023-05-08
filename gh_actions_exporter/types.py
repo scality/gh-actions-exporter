@@ -40,7 +40,6 @@ class WorkflowRun(BaseModel):
     status: str
     head_sha: Optional[str] = None
     conclusion: Optional[str] = None
-    head_sha: str
     workflow_id: int
     run_number: int
     head_branch: str

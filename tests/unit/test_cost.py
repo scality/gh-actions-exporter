@@ -33,7 +33,7 @@ def test_runner_type_job(mocker):
             "self-hosted"
         ]
     )
-    assert Cost(Settings())._runner_type_job(job_request) == "self-hosted"
+    assert Cost(Settings())._runner_type_job(dict(job_request)) == "self-hosted"
 
     job_request = WorkflowJob(
         id=1,
@@ -51,46 +51,47 @@ def test_runner_type_job(mocker):
             "ubuntu-latest"
         ]
     )
-    assert Cost(Settings())._runner_type_job(job_request) == "github-hosted"
+    assert Cost(Settings())._runner_type_job(dict(job_request)) == "github-hosted"
 
 def test_get_job_cost():
     settings = Settings()
 
-    job_request = WorkflowJob(
-        id=1,
-        run_id=1,
-        run_url="1",
-        run_attempt=1,
-        node_id="1",
-        head_sha="1",
-        url="1",
-        html_url="1",
-        status="1",
-        started_at=datetime.datetime(2022, 5, 4, 9, 0),
-        completed_at=datetime.datetime(2022, 5, 4, 10, 0),
-        name="1",
-        labels=[
+    job_request = {
+        "id": 1,
+        "run_id": 1,
+        "run_url": "1",
+        "run_attempt": 1,
+        "node_id": "1",
+        "head_sha": "1",
+        "url": "1",
+        "html_url": "1",
+        "status": "1",
+        "started_at": "2021-11-16T17:52:47Z",
+        "completed_at": "2021-11-16T17:58:47Z",
+        "name": "1",
+        "labels": [
             "ubuntu-latest",
             "self-hosted"
         ]
-    )
-    assert Cost(settings)._get_job_cost(job_request, "large") == 0.96
+    }
+    assert Cost(settings)._get_job_cost(dict(job_request), "large") == 0.096
 
-    job_request = WorkflowJob(
-        id=1,
-        run_id=1,
-        run_url="1",
-        run_attempt=1,
-        node_id="1",
-        head_sha="1",
-        url="1",
-        html_url="1",
-        status="1",
-        started_at=datetime.datetime(2022, 5, 4, 10, 0),
-        completed_at=datetime.datetime(2022, 5, 4, 10, 30),
-        name="1",
-        labels=[
+    job_request = {
+        "id": 1,
+        "run_id": 1,
+        "run_url": "1",
+        "run_attempt": 1,
+        "node_id": "1",
+        "head_sha": "1",
+        "url": "1",
+        "html_url": "1",
+        "status": "1",
+        "started_at": "2021-11-16T17:51:47Z",
+        "completed_at": "2021-11-16T17:59:47Z",
+        "name": "1",
+        "labels": [
+            "ubuntu-latest",
             "self-hosted"
         ]
-    )
-    assert Cost(settings)._get_job_cost(job_request, "flavor") == 0.24
+    }
+    assert Cost(settings)._get_job_cost(dict(job_request), "flavor") == 0.064

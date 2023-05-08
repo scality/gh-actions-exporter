@@ -27,11 +27,11 @@ class WebhookManager(object):
             getattr(self, self.event)()
 
     def workflow_run(self):
-        #if self.settings.exporter_enabled:
+        if self.settings.exporter_enabled:
             self.metrics.handle_workflow_duration(self.payload)
             self.metrics.handle_workflow_status(self.payload)
             self.metrics.handle_workflow_rebuild(self.payload)
-        #if self.settings.check_runs_enabled:
+        if self.settings.check_runs_enabled:
             self.cost.display_cost(self.payload)
 
     def workflow_job(self):
