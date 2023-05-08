@@ -14,7 +14,7 @@ def headers():
     }
     return headers
 
-def test_runner_type_job(mocker):
+def test_runner_type_job():
     job_request = WorkflowJob(
         id=1,
         run_id=1,
@@ -95,3 +95,95 @@ def test_get_job_cost():
         ]
     }
     assert Cost(settings)._get_job_cost(dict(job_request), "flavor") == 0.064
+
+def test_get_workflow_jobs():
+    g = MagicMock()
+    settings = Settings()
+    webhook = MagicMock()
+    webhook.organization.login = "myorg"
+    webhook.repository.name = "myrepo"
+    webhook.workflow_run.id = 123
+
+    g.rest.checks.list_for_ref.return_value.json.return_value = {
+        "check_runs": [
+            {
+                "name": settings.title,
+                "app": {"id": settings.github_app_id},
+                "output": {"summary": "Previous summary"}
+            },
+            {
+                "name": "Another check run",
+                "app": {"id": 456},
+                "output": {"summary": "Another summary"}
+            }
+        ]
+    }
+
+    cost = Cost(settings)
+    summary = cost._get_previous_check_run(g, webhook)
+    assert summary == "Previous summary"
+
+    g.rest.checks.list_for_ref.return_value.json.return_value = {
+        "check_runs": [
+            {
+                "name": settings.title,
+                "app": {"id": 12},
+                "output": {"summary": "Previous summary"}
+            },
+            {
+                "name": "Another check run",
+                "app": {"id": 456},
+                "output": {"summary": "Another summary"}
+            }
+        ]
+    }
+
+    summary = cost._get_previous_check_run(g, webhook)
+    assert summary == ""
+
+def test_get_previous_check_run():
+    g = MagicMock()
+    webhook = MagicMock()
+    settings = Settings()
+    cost = Cost(settings)
+    
+    webhook.organization.login = "myorg"
+    webhook.repository.name = "myrepo"
+    webhook.workflow_run.head_sha = "1234567890abcdef"
+
+    g.rest.checks.list_for_ref.return_value.json.return_value = {
+        "check_runs": [
+            {
+                "name": settings.title,
+                "app": {"id": settings.github_app_id},
+                "output": {"summary": "my summary"},
+            },
+            {
+                "name": "other check",
+                "app": {"id": 456},
+                "output": {"summary": "other summary"},
+            },
+        ]
+    }
+
+    result = cost._get_previous_check_run(g, webhook)
+    assert result == "my summary"
+    g.rest.checks.list_for_ref.assert_called_once_with("myorg", "myrepo", "1234567890abcdef")
+
+    g.rest.checks.list_for_ref.return_value.json.return_value = {
+        "check_runs": [
+            {
+                "name": "check",
+                "app": {"id": 123},
+                "output": {"summary": "my summary"},
+            },
+            {
+                "name": "other check",
+                "app": {"id": 456},
+                "output": {"summary": "other summary"},
+            },
+        ]
+    }
+    
+    result = cost._get_previous_check_run(g, webhook)
+    assert result == ""

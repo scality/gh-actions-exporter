@@ -30,14 +30,13 @@ class Cost(object):
         return workflow_jobs
 
     def _generate_check_run_data(self, webhook: WebHook, total_cost: float, jobs_cost: List[JobCost], summary: str) -> CheckRunData:
-        check_run_data = CheckRunData(
+        return CheckRunData(
             summary=summary,
             settings={"summary": self.settings.summary},
             workflow_run=webhook.workflow_run,
             jobs_cost=jobs_cost,
             total_cost=total_cost
         )
-        return check_run_data
 
     def _get_previous_check_run(self, g: GitHub, webhook: WebHook) -> str:
         check_runs: dict = g.rest.checks.list_for_ref(webhook.organization.login, webhook.repository.name, webhook.workflow_run.head_sha).json()
