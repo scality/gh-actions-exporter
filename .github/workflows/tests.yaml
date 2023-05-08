@@ -1,34 +1,29 @@
 ---
-
 name: tests
 
 on: [push]
 
 jobs:
-  tests:
-    runs-on: ubuntu-20.04
+  lint:
+    runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
-      with:
-        python-version: '3.10'
-    - name: install poetry
-      run: pip install poetry
-    - name: Poetry deps cache
-      uses: actions/cache@v2
-      with:
-        path: "~/.cache/pypoetry"
-        key: poetry-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
-    - name: Install dependencies
-      run: poetry install
-    - name: Lint project
-      run: poetry run flake8
-    - uses: azure/setup-helm@v1
-      with:
-        version: v2.17.0
-    - run: helm lint ./charts/gh-action-exporter
-    - name: Run tests
-      run: poetry run pytest --cov=. --cov-report=xml
-    - name: Upload test coverage
-      uses: codecov/codecov-action@v2
-      if: always()
+      - uses: actions/checkout@v3
+      - name: Trunk Check
+        uses: trunk-io/trunk-action@v1
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: install poetry
+        run: pip install poetry
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+          cache: poetry
+      - name: Install dependencies
+        run: poetry install
+      - name: Run tests
+        run: poetry run pytest --cov=. --cov-report=xml
+      - name: Upload test coverage
+        uses: codecov/codecov-action@v2
+        if: always()
