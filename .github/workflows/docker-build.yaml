@@ -11,3 +11,4 @@ jobs:
     uses: scality/workflows/.github/workflows/docker-build.yaml@v1
     with:
       name: gh-actions-exporter
+      namespace: scality
