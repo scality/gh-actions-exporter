@@ -46,14 +46,14 @@ class Settings(BaseSettings):
     flavor_label: Optional[str] = "flavor"
     default_cost: Optional[float] = 0.008
 
-    exporter_enabled: bool = True
-    check_runs_enabled: bool = True
+    exporter_enabled: Optional[bool] = True
+    check_runs_enabled: Optional[bool] = True
     github_app_id: int
     github_app_installation_id: int
     github_app_private_key: SecretStr
 
-    title: str = "Workflow Costs"
-    summary: str = """Behind a CI run, there are servers running which
+    title: Optional[str] = "Workflow Costs"
+    summary: Optional[str] = """Behind a CI run, there are servers running which
                     cost money, so it is important to be careful not to
                     abuse this feature to avoid wasting money."""
 
