@@ -4,8 +4,10 @@ from typing import List
 import jinja2
 from githubkit import GitHub
 
+from githubkit.rest.webhooks.model import WorkflowJobCompletedPropWorkflowJob
+
 from gh_actions_exporter.config import Settings
-from gh_actions_exporter.tokenGenerator import TokenGenerator
+from gh_actions_exporter.githubClient import GithubClient
 from gh_actions_exporter.types import CheckRunData, JobCost, WebHook, WorkflowJob
 
 
@@ -13,7 +15,7 @@ class Cost(object):
     def __init__(self, settings: Settings):
         self.settings: Settings = settings
 
-    def _runner_type_job(self, job_request: WorkflowJob) -> str:
+    def _runner_type_job(self, job_request: WorkflowJobCompletedPropWorkflowJob) -> str:
         if "self-hosted" in job_request["labels"]:
             return "self-hosted"
         return "github-hosted"
@@ -35,7 +37,7 @@ class Cost(object):
             return duration / 60 * self.settings.default_cost
         return duration / 60 * cost_per_min
 
-    def _get_workflow_jobs(self, webhook: WebHook, g: GitHub) -> dict:
+    def _get_workflow_jobs(self, webhook: WebHook, g: GitHub) -> List[WorkflowJob]:
         workflow_jobs: dict = g.rest.actions.list_jobs_for_workflow_run(
             webhook.organization.login, webhook.repository.name, webhook.workflow_run.id
         ).json()
@@ -83,10 +85,10 @@ class Cost(object):
             webhook.organization.login, webhook.repository.name, data=data
         )
 
-    def display_cost(self, webhook: WebHook):
+    def display_cost(self, webhook: WebHook, github_client: GithubClient):
         if webhook.workflow_run.conclusion:
-            token_generator: TokenGenerator = TokenGenerator(self.settings)
-            g: GitHub = token_generator.generate_token()
+            #token_generator: GithubClient = GithubClient(self.settings)
+            g: GitHub = github_client.get_client()
 
             workflow_jobs: dict = self._get_workflow_jobs(webhook, g)
 
@@ -104,7 +106,7 @@ class Cost(object):
 
             summary: str = self._get_previous_check_run(g, webhook)
 
-            with open("workflow_cost.md.j2", "r", encoding="utf-8") as template_file:
+            with open("template/workflow_cost.md.j2", "r", encoding="utf-8") as template_file:
                 template_content = template_file.read()
             data: CheckRunData = self._generate_check_run_data(
                 webhook, total_cost, jobs_cost, summary

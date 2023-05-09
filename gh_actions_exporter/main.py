@@ -1,4 +1,5 @@
 from functools import lru_cache
+from gh_actions_exporter.githubClient import GithubClient
 
 import uvicorn
 from fastapi import Depends, FastAPI, Request
@@ -21,8 +22,8 @@ def metrics() -> Metrics:
 
 
 @lru_cache()
-def cost() -> Cost:
-    return Cost(get_settings())
+def github_client() -> GithubClient:
+    return GithubClient(get_settings())
 
 
 app = FastAPI()
@@ -42,14 +43,14 @@ async def webhook(
     request: Request,
     settings: Settings = Depends(get_settings),
     metrics: Metrics = Depends(metrics),
-    cost: Cost = Depends(cost),
+    github_client: GithubClient = Depends(github_client)
 ):
     WebhookManager(
         payload=webhook,
         event=request.headers["X-Github-Event"],
         metrics=metrics,
         settings=settings,
-        cost=cost,
+        github_client=github_client
     )()
     return "Accepted"
 

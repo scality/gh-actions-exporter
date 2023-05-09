@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import Optional
+from gh_actions_exporter.config import Settings
 
 from pydantic import BaseModel
 
@@ -74,7 +75,7 @@ class JobCost(BaseModel):
 
 class CheckRunData(BaseModel):
     summary: str
-    settings: dict
-    workflow_run: dict
-    jobs_cost: list[dict]
+    settings: Settings
+    workflow_run: WorkflowRun
+    jobs_cost: list[JobCost]
     total_cost: float

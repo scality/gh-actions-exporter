@@ -64,7 +64,7 @@ def test_get_job_cost():
         "started_at": "2021-11-16T17:52:47Z",
         "completed_at": "2021-11-16T17:58:47Z",
         "name": "1",
-        "labels": ["ubuntu-latest", "self-hosted"],
+        "labels": ["self-hosted"],
     }
     assert Cost(settings)._get_job_cost(dict(job_request), "large") == 0.096
 
@@ -81,7 +81,7 @@ def test_get_job_cost():
         "started_at": "2021-11-16T17:51:47Z",
         "completed_at": "2021-11-16T17:59:47Z",
         "name": "1",
-        "labels": ["ubuntu-latest", "self-hosted"],
+        "labels": ["self-hosted"],
     }
     assert Cost(settings)._get_job_cost(dict(job_request), "flavor") == 0.064
 

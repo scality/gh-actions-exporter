@@ -2,6 +2,7 @@ import logging
 
 from gh_actions_exporter.config import Settings
 from gh_actions_exporter.cost import Cost
+from gh_actions_exporter.githubClient import GithubClient
 from gh_actions_exporter.metrics import Metrics
 from gh_actions_exporter.types import WebHook
 
@@ -18,13 +19,14 @@ class WebhookManager(object):
         event: str,
         metrics: Metrics,
         settings: Settings,
-        cost: Cost,
+        github_client: GithubClient
     ):
         self.event = event
         self.payload = payload
         self.metrics = metrics
         self.settings = settings
-        self.cost = cost
+        self.github_client = github_client
+        self.cost = Cost(self.settings)
 
     def __call__(self, *args, **kwargs):
         # Check if we managed this event
@@ -40,7 +42,7 @@ class WebhookManager(object):
             self.metrics.handle_workflow_status(self.payload)
             self.metrics.handle_workflow_rebuild(self.payload)
         if self.settings.check_runs_enabled:
-            self.cost.display_cost(self.payload)
+            self.cost.display_cost(self.payload, self.github_client)
 
     def workflow_job(self):
         self.metrics.handle_job_status(self.payload, self.settings)
