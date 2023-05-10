@@ -1,6 +1,7 @@
 from functools import lru_cache
 
 import pytest
+
 from fastapi.testclient import TestClient
 from prometheus_client import REGISTRY
 
@@ -102,11 +103,11 @@ def workflow_job():
             "url": "https://api.github.com/repos/scalanga-devl/fake",
             "html_url": "https://github.com/scalanga-devl/fake",
             "status": "in_progress",
-            "conclusion": None,
+            "conclusion": "success",
+            "create_at": "2021-11-29T14:46:57Z",
             "started_at": "2021-11-29T14:46:57Z",
-            "completed_at": None,
+            "completed_at": "2021-11-29T14:46:57Z",
             "name": "greet (tata)",
-            "runner_name": "GitHub Actions 3",
             "steps": [
                 {
                     "name": "Set up job",
@@ -114,10 +115,17 @@ def workflow_job():
                     "conclusion": "success",
                     "number": 1,
                     "started_at": "2021-11-29T14:50:57Z",
-                    "completed_at": None,
+                    "completed_at": "2021-11-29T14:46:57Z",
                 }
             ],
+            "check_run_url": "x",
             "labels": ["ubuntu-latest"],
+            "runner_id": 1,
+            "runner_name": "GitHub Actions 3",
+            "runner_group_id": 1,
+            "runner_group_name": "None",
+            "workflow_name": "None",
+            "head_branch": "None"
         },
         "repository": {
             "name": "test-runner-operator",

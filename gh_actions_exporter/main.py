@@ -5,7 +5,6 @@ import uvicorn
 from fastapi import Depends, FastAPI, Request
 
 from gh_actions_exporter.config import Settings
-from gh_actions_exporter.cost import Cost
 from gh_actions_exporter.metrics import Metrics, prometheus_metrics
 from gh_actions_exporter.types import WebHook
 from gh_actions_exporter.Webhook import WebhookManager
@@ -22,7 +21,7 @@ def metrics() -> Metrics:
 
 
 @lru_cache()
-def github_client() -> GithubClient:
+def github() -> GithubClient:
     return GithubClient(get_settings())
 
 
@@ -43,7 +42,7 @@ async def webhook(
     request: Request,
     settings: Settings = Depends(get_settings),
     metrics: Metrics = Depends(metrics),
-    github_client: GithubClient = Depends(github_client)
+    github_client: GithubClient = Depends(github)
 ):
     WebhookManager(
         payload=webhook,

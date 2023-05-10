@@ -1,3 +1,5 @@
+
+
 def test_unsupported_events(client):
     """Ensure we don't crash on other workflow_run events"""
     headers = {"X-GitHub-Event": "push"}

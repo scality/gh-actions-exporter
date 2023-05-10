@@ -7,8 +7,9 @@ from typing import Dict, List
 from fastapi.requests import Request
 from fastapi.responses import Response
 from gh_actions_exporter.config import Relabel, RelabelType, Settings
-from gh_actions_exporter.types import WebHook, WorkflowJob
+from gh_actions_exporter.types import WebHook
 from prometheus_client import Counter, Histogram
+from githubkit.rest import Job
 
 
 def prometheus_metrics(request: Request) -> Response:
@@ -143,7 +144,7 @@ class Metrics(object):
                 result[relabel.label] = label
         return result
 
-    def relabel_job_names(self, relabel: Relabel, job: WorkflowJob) -> dict:
+    def relabel_job_names(self, relabel: Relabel, job: Job) -> dict:
         result = {
             relabel.label: relabel.default
         }
@@ -238,6 +239,7 @@ class Metrics(object):
         # look for the flavor label
         flavor = labels.get(settings.flavor_label, None)
         cost_per_min = settings.job_costs.get(flavor, settings.default_cost)
+
         if webhook.workflow_job.conclusion and cost_per_min:
             duration = self._get_job_duration(webhook)
             # Cost of runner is duration / 60 * cost_per_min

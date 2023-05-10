@@ -94,6 +94,7 @@ def test_job_cost(client, workflow_job, headers):
 
     workflow_job["workflow_job"]["conclusion"] = "success"
     workflow_job["workflow_job"]["completed_at"] = "2021-11-29T14:59:57Z"
+
     response = client.post("/webhook", json=workflow_job, headers=headers)
     assert response.status_code == 202
 
