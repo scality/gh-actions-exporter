@@ -1,12 +1,13 @@
-import uvicorn
-
-from fastapi import Depends, FastAPI, Request
 from functools import lru_cache
 
-from gh_actions_exporter.metrics import prometheus_metrics, Metrics
+import uvicorn
+from fastapi import Depends, FastAPI, Request
+from prometheus_client import make_asgi_app
+
+from gh_actions_exporter.config import Settings
+from gh_actions_exporter.metrics import Metrics
 from gh_actions_exporter.types import WebHook
 from gh_actions_exporter.Webhook import WebhookManager
-from gh_actions_exporter.config import Settings
 
 
 @lru_cache()
@@ -21,8 +22,8 @@ def metrics() -> Metrics:
 
 app = FastAPI()
 
-
-app.add_route('/metrics', prometheus_metrics)
+metrics_app = make_asgi_app()
+app.mount("/metrics", metrics_app)
 
 
 @app.get("/", status_code=200)
@@ -35,13 +36,13 @@ async def webhook(
     webhook: WebHook,
     request: Request,
     settings: Settings = Depends(get_settings),
-    metrics: Metrics = Depends(metrics)
+    metrics: Metrics = Depends(metrics),
 ):
     WebhookManager(
         payload=webhook,
-        event=request.headers['X-Github-Event'],
+        event=request.headers["X-Github-Event"],
         metrics=metrics,
-        settings=settings
+        settings=settings,
     )()
     return "Accepted"
 
@@ -63,13 +64,9 @@ async def clear(metrics: Metrics = Depends(metrics)):
     metrics.job_status_queued.clear()
     metrics.job_status_total.clear()
     metrics.job_start_duration.clear()
+    metrics.job_cost.clear()
 
 
 def start():
     """Launched with `poetry run start` at root level"""
-    uvicorn.run(
-        "gh_actions_exporter.main:app",
-        host="0.0.0.0",
-        port=8000,
-        reload=True
-    )
+    uvicorn.run("gh_actions_exporter.main:app", host="0.0.0.0", port=8000, reload=True)
