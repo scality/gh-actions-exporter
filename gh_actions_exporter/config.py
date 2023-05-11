@@ -1,9 +1,9 @@
-import yaml
 from enum import Enum
 from pathlib import Path
-from typing import Dict, Any, List, Optional
+from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel, BaseSettings
+import yaml
+from pydantic import BaseModel, BaseSettings, SecretStr
 
 
 def yaml_config_settings_source(settings: BaseSettings) -> Dict[str, Any]:
@@ -18,8 +18,8 @@ def yaml_config_settings_source(settings: BaseSettings) -> Dict[str, Any]:
 
 
 class RelabelType(str, Enum):
-    name = 'name'
-    label = 'label'
+    name = "name"
+    label = "label"
 
 
 class Relabel(BaseModel):
@@ -37,17 +37,23 @@ class ConfigFile(BaseSettings):
 class Settings(BaseSettings):
     job_relabelling: Optional[List[Relabel]] = []
     job_costs: Optional[Dict[str, float]] = {
-        'medium': 0.008,
-        'large': 0.016,
-        'xlarge': 0.032,
-        '2xlarge': 0.064,
-        '3xlarge': 0.128
+        "medium": 0.008,
+        "large": 0.016,
+        "xlarge": 0.032,
+        "2xlarge": 0.064,
+        "3xlarge": 0.128,
     }
-    flavor_label: Optional[str] = 'flavor'
+    flavor_label: Optional[str] = "flavor"
     default_cost: Optional[float] = 0.008
+
+    github_app_id: int
+    github_app_installation_id: int
+    github_app_private_key: SecretStr
 
     class Config:
         config: ConfigFile = ConfigFile()
+        env_file = ".env"
+        env_file_encoding = "utf-8"
 
         @classmethod
         def customise_sources(
