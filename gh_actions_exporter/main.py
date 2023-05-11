@@ -22,7 +22,7 @@ def metrics() -> Metrics:
 
 
 @lru_cache()
-def github_client() -> GitHub:
+def github_client() -> GitHub or None:
     settings: Settings = get_settings()
     if settings.check_runs_enabled:
         return GitHub(
