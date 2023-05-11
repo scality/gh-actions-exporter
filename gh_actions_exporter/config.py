@@ -46,10 +46,6 @@ class Settings(BaseSettings):
     flavor_label: Optional[str] = 'flavor'
     default_cost: Optional[float] = 0.008
 
-    github_app_id: int
-    github_app_installation_id: int
-    github_app_private_key: SecretStr
-
     class Config:
         config: ConfigFile = ConfigFile()
         env_file = ".env"
