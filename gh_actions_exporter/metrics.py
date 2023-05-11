@@ -143,6 +143,7 @@ class Metrics(object):
             repository_visibility=webhook.repository.visibility,
             repository=webhook.repository.full_name,
         )
+
         for relabel in settings.job_relabelling:
             if relabel.type == RelabelType.label:
                 labels.update(
