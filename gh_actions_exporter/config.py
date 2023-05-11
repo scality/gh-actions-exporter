@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import yaml
-from pydantic import BaseModel, BaseSettings
+from pydantic import BaseModel, BaseSettings, SecretStr
 
 
 def yaml_config_settings_source(settings: BaseSettings) -> Dict[str, Any]:
@@ -45,6 +45,10 @@ class Settings(BaseSettings):
     }
     flavor_label: Optional[str] = "flavor"
     default_cost: Optional[float] = 0.008
+
+    github_app_id: Optional[int]
+    github_app_installation_id: Optional[int]
+    github_app_private_key: Optional[SecretStr]
 
     class Config:
         config: ConfigFile = ConfigFile()
