@@ -1,5 +1,6 @@
 import logging
 from gh_actions_exporter.config import Settings
+from gh_actions_exporter.githubClient import GithubClient
 from gh_actions_exporter.types import WebHook
 from gh_actions_exporter.metrics import Metrics
 
@@ -10,11 +11,19 @@ class WebhookManager(object):
     event: str
     payload: WebHook
 
-    def __init__(self, payload: WebHook, event: str, metrics: Metrics, settings: Settings):
+    def __init__(
+        self,
+        payload: WebHook,
+        event: str,
+        metrics: Metrics,
+        settings: Settings,
+        github_client: GithubClient
+    ):
         self.event = event
         self.payload = payload
         self.metrics = metrics
         self.settings = settings
+        self.github_client = github_client
 
     def __call__(self, *args, **kwargs):
         # Check if we managed this event
