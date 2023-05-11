@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional
 import yaml
 from pydantic import BaseModel, BaseSettings, SecretStr
 
+
 def yaml_config_settings_source(settings: BaseSettings) -> Dict[str, Any]:
     """
     A simple settings source that loads variables from a yaml file
