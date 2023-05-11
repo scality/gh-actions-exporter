@@ -222,10 +222,15 @@ class Metrics(object):
             )
             self.job_start_duration.labels(**labels).observe(duration)
 
+    def flavor_type(self, webhook: WebHook) -> str or None:
+        for label in webhook.workflow_job.labels:
+            if label in self.settings.job_costs:
+                return label
+        return None
+
     def handle_job_cost(self, webhook: WebHook, settings: Settings):
         labels = self.job_labels(webhook, settings)
-        # look for the flavor label
-        flavor = labels.get(settings.flavor_label, None)
+        flavor = self.flavor_type(webhook)
         cost_per_min = settings.job_costs.get(flavor, settings.default_cost)
         if webhook.workflow_job.conclusion and cost_per_min:
             duration = self._get_job_duration(webhook)

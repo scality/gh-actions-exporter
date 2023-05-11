@@ -1,8 +1,8 @@
-import yaml
 from enum import Enum
 from pathlib import Path
-from typing import Dict, Any, List, Optional
+from typing import Any, Dict, List, Optional
 
+import yaml
 from pydantic import BaseModel, BaseSettings
 
 
@@ -18,8 +18,8 @@ def yaml_config_settings_source(settings: BaseSettings) -> Dict[str, Any]:
 
 
 class RelabelType(str, Enum):
-    name = 'name'
-    label = 'label'
+    name = "name"
+    label = "label"
 
 
 class Relabel(BaseModel):
@@ -37,13 +37,12 @@ class ConfigFile(BaseSettings):
 class Settings(BaseSettings):
     job_relabelling: Optional[List[Relabel]] = []
     job_costs: Optional[Dict[str, float]] = {
-        'medium': 0.008,
-        'large': 0.016,
-        'xlarge': 0.032,
-        '2xlarge': 0.064,
-        '3xlarge': 0.128
+        "medium": 0.008,
+        "large": 0.016,
+        "xlarge": 0.032,
+        "2xlarge": 0.064,
+        "3xlarge": 0.128,
     }
-    flavor_label: Optional[str] = 'flavor'
     default_cost: Optional[float] = 0.008
 
     class Config:
