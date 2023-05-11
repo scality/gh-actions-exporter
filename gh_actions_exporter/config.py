@@ -46,6 +46,8 @@ class Settings(BaseSettings):
     flavor_label: Optional[str] = "flavor"
     default_cost: Optional[float] = 0.008
 
+    exporter_enabled: bool = True
+    check_runs_enabled: bool = True
     github_app_id: Optional[int]
     github_app_installation_id: Optional[int]
     github_app_private_key: Optional[SecretStr]

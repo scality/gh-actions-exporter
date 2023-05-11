@@ -24,13 +24,15 @@ def metrics() -> Metrics:
 @lru_cache()
 def github_client() -> GitHub:
     settings: Settings = get_settings()
-    return GitHub(
-        AppInstallationAuthStrategy(
-            settings.github_app_id,
-            settings.github_app_private_key.get_secret_value(),
-            settings.github_app_installation_id,
+    if settings.check_runs_enabled:
+        return GitHub(
+            AppInstallationAuthStrategy(
+                settings.github_app_id,
+                settings.github_app_private_key.get_secret_value(),
+                settings.github_app_installation_id,
+            )
         )
-    )
+    return None
 
 
 app = FastAPI()
