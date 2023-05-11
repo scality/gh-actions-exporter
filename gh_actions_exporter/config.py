@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import yaml
-from pydantic import BaseModel, BaseSettings, SecretStr
+from pydantic import BaseModel, BaseSettings
 
 
 def yaml_config_settings_source(settings: BaseSettings) -> Dict[str, Any]:
