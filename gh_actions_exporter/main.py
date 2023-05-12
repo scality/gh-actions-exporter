@@ -2,6 +2,7 @@ from functools import lru_cache
 
 import uvicorn
 from fastapi import Depends, FastAPI, Request
+from githubkit import AppInstallationAuthStrategy, GitHub
 from prometheus_client import make_asgi_app
 
 from gh_actions_exporter.config import Settings
@@ -18,6 +19,20 @@ def get_settings() -> Settings:
 @lru_cache()
 def metrics() -> Metrics:
     return Metrics(get_settings())
+
+
+@lru_cache()
+def github_client() -> GitHub or None:
+    settings: Settings = get_settings()
+    if settings.check_runs_enabled:
+        return GitHub(
+            AppInstallationAuthStrategy(
+                settings.github_app_id,
+                settings.github_app_private_key.get_secret_value(),
+                settings.github_app_installation_id,
+            )
+        )
+    return None
 
 
 app = FastAPI()
@@ -37,12 +52,14 @@ async def webhook(
     request: Request,
     settings: Settings = Depends(get_settings),
     metrics: Metrics = Depends(metrics),
+    github_client: GitHub = Depends(github_client),
 ):
     WebhookManager(
         payload=webhook,
         event=request.headers["X-Github-Event"],
         metrics=metrics,
         settings=settings,
+        github_client=github_client,
     )()
     return "Accepted"
 
