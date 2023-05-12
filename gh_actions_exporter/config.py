@@ -43,7 +43,6 @@ class Settings(BaseSettings):
         "2xlarge": 0.064,
         "3xlarge": 0.128,
     }
-    flavor_label: Optional[str] = "flavor"
     default_cost: Optional[float] = 0.008
 
     check_runs_enabled: bool = False
