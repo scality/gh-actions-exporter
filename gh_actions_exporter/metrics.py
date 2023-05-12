@@ -3,12 +3,14 @@ from typing import Dict, List
 from prometheus_client import Counter, Histogram
 
 from gh_actions_exporter.config import Relabel, RelabelType, Settings
+from gh_actions_exporter.cost import Cost
 from gh_actions_exporter.types import WebHook, WorkflowJob
 
 
 class Metrics(object):
     def __init__(self, settings: Settings):
         self.settings = settings
+        self.cost = Cost(settings)
         self.workflow_labelnames = [
             "repository",
             "workflow_name",
@@ -232,8 +234,6 @@ class Metrics(object):
     def handle_job_cost(self, webhook: WebHook, settings: Settings):
         labels = self.job_labels(webhook, settings)
         flavor = self.flavor_type(webhook)
-        cost_per_min = settings.job_costs.get(flavor, settings.default_cost)
-        if webhook.workflow_job.conclusion and cost_per_min:
-            duration = self._get_job_duration(webhook)
-            # Cost of runner is duration / 60 * cost_per_min
-            self.job_cost.labels(**labels).inc(duration / 60 * cost_per_min)
+        if webhook.workflow_job.conclusion:
+            cost = self.cost.get_job_cost(webhook.workflow_job, flavor)
+            self.job_cost.labels(**labels).inc(cost)
