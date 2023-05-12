@@ -54,7 +54,7 @@ files = [
 name = "certifi"
 version = "2022.12.7"
 description = "Python package for providing Mozilla's CA Bundle."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 files = [
@@ -329,6 +329,30 @@ python-dateutil = ">=2.8.1"
 dev = ["flake8", "markdown", "twine", "wheel"]
 
 [[package]]
+name = "githubkit"
+version = "0.10.3"
+description = "GitHub SDK for Python"
+category = "main"
+optional = false
+python-versions = ">=3.8,<4.0"
+files = [
+    {file = "githubkit-0.10.3-py3-none-any.whl", hash = "sha256:36d6f0fe03430f8b7c80fe81f657ec2e47360a05e8552967010783bd71a0e1bc"},
+    {file = "githubkit-0.10.3.tar.gz", hash = "sha256:8d8ae7c98c4e8ba1092d970df7d52ed6e0ae043cfee66db4a8d78a20e8ef65d7"},
+]
+
+[package.dependencies]
+httpx = ">=0.23.0,<1.0.0"
+pydantic = ">=1.9.1,<2.0.0"
+typing-extensions = ">=4.3.0,<5.0.0"
+
+[package.extras]
+all = ["PyJWT[crypto] (>=2.4.0,<3.0.0)", "anyio (>=3.6.1,<4.0.0)"]
+auth = ["PyJWT[crypto] (>=2.4.0,<3.0.0)", "anyio (>=3.6.1,<4.0.0)"]
+auth-app = ["PyJWT[crypto] (>=2.4.0,<3.0.0)"]
+auth-oauth-device = ["anyio (>=3.6.1,<4.0.0)"]
+jwt = ["PyJWT[crypto] (>=2.4.0,<3.0.0)"]
+
+[[package]]
 name = "h11"
 version = "0.14.0"
 description = "A pure-Python, bring-your-own-I/O implementation of HTTP/1.1"
@@ -339,6 +363,28 @@ files = [
     {file = "h11-0.14.0-py3-none-any.whl", hash = "sha256:e3fe4ac4b851c468cc8363d500db52c2ead036020723024a109d37346efaa761"},
     {file = "h11-0.14.0.tar.gz", hash = "sha256:8f19fbbe99e72420ff35c00b27a34cb9937e902a8b810e2c88300c6f0a3b699d"},
 ]
+
+[[package]]
+name = "httpcore"
+version = "0.17.0"
+description = "A minimal low-level HTTP client."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "httpcore-0.17.0-py3-none-any.whl", hash = "sha256:0fdfea45e94f0c9fd96eab9286077f9ff788dd186635ae61b312693e4d943599"},
+    {file = "httpcore-0.17.0.tar.gz", hash = "sha256:cc045a3241afbf60ce056202301b4d8b6af08845e3294055eb26b09913ef903c"},
+]
+
+[package.dependencies]
+anyio = ">=3.0,<5.0"
+certifi = "*"
+h11 = ">=0.13,<0.15"
+sniffio = ">=1.0.0,<2.0.0"
+
+[package.extras]
+http2 = ["h2 (>=3,<5)"]
+socks = ["socksio (>=1.0.0,<2.0.0)"]
 
 [[package]]
 name = "httptools"
@@ -367,6 +413,30 @@ files = [
 
 [package.extras]
 test = ["Cython (==0.29.22)"]
+
+[[package]]
+name = "httpx"
+version = "0.24.0"
+description = "The next generation HTTP client."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "httpx-0.24.0-py3-none-any.whl", hash = "sha256:447556b50c1921c351ea54b4fe79d91b724ed2b027462ab9a329465d147d5a4e"},
+    {file = "httpx-0.24.0.tar.gz", hash = "sha256:507d676fc3e26110d41df7d35ebd8b3b8585052450f4097401c9be59d928c63e"},
+]
+
+[package.dependencies]
+certifi = "*"
+httpcore = ">=0.15.0,<0.18.0"
+idna = "*"
+sniffio = "*"
+
+[package.extras]
+brotli = ["brotli", "brotlicffi"]
+cli = ["click (>=8.0.0,<9.0.0)", "pygments (>=2.0.0,<3.0.0)", "rich (>=10,<14)"]
+http2 = ["h2 (>=3,<5)"]
+socks = ["socksio (>=1.0.0,<2.0.0)"]
 
 [[package]]
 name = "idna"
@@ -1376,4 +1446,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "a00f10e925efb1b5710afb2c8ea2e481d00a8afcc2d5c23d8f9212373e7215de"
+content-hash = "82b9d6a95098698033f53ae48091efca8728186150952285b3ee9c405b5c9ba8"

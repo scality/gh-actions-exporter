@@ -1,7 +1,10 @@
 import logging
+
+from githubkit import GitHub
+
 from gh_actions_exporter.config import Settings
-from gh_actions_exporter.types import WebHook
 from gh_actions_exporter.metrics import Metrics
+from gh_actions_exporter.types import WebHook
 
 logger = logging.getLogger("runner_manager")
 
@@ -10,18 +13,26 @@ class WebhookManager(object):
     event: str
     payload: WebHook
 
-    def __init__(self, payload: WebHook, event: str, metrics: Metrics, settings: Settings):
+    def __init__(
+        self,
+        payload: WebHook,
+        event: str,
+        metrics: Metrics,
+        settings: Settings,
+        github_client: GitHub,
+    ):
         self.event = event
         self.payload = payload
         self.metrics = metrics
         self.settings = settings
+        self.github_client = github_client
 
     def __call__(self, *args, **kwargs):
         # Check if we managed this event
         if self.event not in [method for method in dir(self) if method[:2] != "__"]:
             logger.error(f"Event {self.event} not managed")
         else:
-            logger.info(f'Get event: {self.event}')
+            logger.info(f"Get event: {self.event}")
             getattr(self, self.event)()
 
     def workflow_run(self):
@@ -35,4 +46,4 @@ class WebhookManager(object):
         self.metrics.handle_job_cost(self.payload, self.settings)
 
     def ping(self):
-        logger.info('Ping from Github')
+        logger.info("Ping from Github")
