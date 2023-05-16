@@ -8,6 +8,9 @@ on:
 
 jobs:
   docker-build:
+    permissions:
+      contents: read
+      packages: write
     uses: scality/workflows/.github/workflows/docker-build.yaml@v1
     with:
       name: gh-actions-exporter
