@@ -130,7 +130,7 @@ class Metrics(object):
 
     def relabel_job_names(self, relabel: Relabel, job: WorkflowJob) -> dict:
         result = {relabel.label: relabel.default}
-        if job.status == "queued":
+        if job.status == "queued" or job.conclusion == "skipped":
             result[relabel.label] = ""
         else:
             for label in relabel.values:
