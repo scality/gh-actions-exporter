@@ -103,7 +103,7 @@ def test_job_cost(client, workflow_job, headers):
             assert "0.104" in line
 
 
-def test_skipped_job(client, workflow_job, headers):
+def test_skipped_job(override_job_config, client, workflow_job, headers):
     workflow_job["workflow_job"]["runner_name"] = None
     workflow_job["workflow_job"]["status"] = "completed"
     workflow_job["workflow_job"]["conclusion"] = "skipped"
