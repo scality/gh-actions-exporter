@@ -102,6 +102,7 @@ def test_job_cost(client, workflow_job, headers):
         if "github_actions_job_cost_count_total{" in line:
             assert "0.104" in line
 
+
 def test_skipped_job(client, workflow_job, headers):
     workflow_job["workflow_job"]["runner_name"] = None
     workflow_job["workflow_job"]["status"] = "completed"
