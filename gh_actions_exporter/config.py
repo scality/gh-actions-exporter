@@ -36,7 +36,16 @@ class ConfigFile(BaseSettings):
 
 class Settings(BaseSettings):
     job_relabelling: Optional[List[Relabel]] = []
-    job_costs: Optional[Dict[str, float]] = {}
+    job_costs: Optional[Dict[str, float]] = {
+        "ubuntu-latest": 0.008,
+        "ubuntu-22.04": 0.008,
+        "ubuntu-20.04": 0.008,
+        "medium": 0.008,
+        "large": 0.016,
+        "xlarge": 0.032,
+        "2xlarge": 0.064,
+        "3xlarge": 0.128,
+    }
     default_cost: Optional[float] = 0
 
     check_runs_enabled: bool = False
