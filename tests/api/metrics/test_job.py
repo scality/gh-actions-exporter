@@ -101,3 +101,12 @@ def test_job_cost(client, workflow_job, headers):
     for line in metrics.text.split("\n"):
         if "github_actions_job_cost_count_total{" in line:
             assert "0.104" in line
+
+
+def test_skipped_job(override_job_config, client, workflow_job, headers):
+    workflow_job["workflow_job"]["runner_name"] = None
+    workflow_job["workflow_job"]["status"] = "completed"
+    workflow_job["workflow_job"]["conclusion"] = "skipped"
+    workflow_job["workflow_job"]["completed_at"] = "2021-11-29T14:59:57Z"
+    response = client.post("/webhook", json=workflow_job, headers=headers)
+    assert response.status_code == 202
