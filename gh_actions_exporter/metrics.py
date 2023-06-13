@@ -11,17 +11,16 @@ class Metrics(object):
     def __init__(self, settings: Settings):
         self.settings = settings
         self.cost = Cost(settings)
-        self.workflow_labelnames = [
+
+        self.common_labelnames = [
             "repository",
             "workflow_name",
             "repository_visibility",
         ]
-        self.job_labelnames = [
-            "repository",
+        self.workflow_labelnames = self.common_labelnames.copy()
+        self.job_labelnames = self.common_labelnames.copy() + [
             "job_name",
-            "repository_visibility",
             "runner_type",
-            "workflow_name",
         ]
         for relabel in self.settings.job_relabelling:
             self.job_labelnames.append(relabel.label)
