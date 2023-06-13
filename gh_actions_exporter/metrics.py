@@ -21,6 +21,7 @@ class Metrics(object):
             "job_name",
             "repository_visibility",
             "runner_type",
+            "workflow_name",
         ]
         for relabel in self.settings.job_relabelling:
             self.job_labelnames.append(relabel.label)
@@ -144,6 +145,7 @@ class Metrics(object):
             job_name=webhook.workflow_job.name,
             repository_visibility=webhook.repository.visibility,
             repository=webhook.repository.full_name,
+            workflow_name=webhook.workflow_job.workflow_name,
         )
 
         for relabel in settings.job_relabelling:
