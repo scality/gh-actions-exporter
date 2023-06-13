@@ -50,6 +50,7 @@ def workflow_job():
         "workflow_job": {
             "id": 4355026428,
             "run_id": 1468134741,
+            "workflow_name": "test",
             "run_url": "https://api.github.com/repos/-devl/fake",
             "run_attempt": 1,
             "node_id": "CR_kwDOFqdmms8AAAABA5Rt_A",
