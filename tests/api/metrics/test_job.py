@@ -47,7 +47,15 @@ def test_multiple_job_runs(client, workflow_job, headers):
 
     metrics = client.get("/metrics")
     assert metrics.status_code == 200
-    assert f"workflow_name={workflow_job['workflow_job']['workflow_name']" in metrics.text
+    print("AAAAA")
+    print(metrics.text)
+    print("BBBBB")
+    print(f"workflow_name={workflow_job['workflow_job']['workflow_name']}")
+    print("CCCCC")
+    assert (
+        f"workflow_name=\"{workflow_job['workflow_job']['workflow_name']}\""
+        in metrics.text
+    )
 
     for line in metrics.text.split("\n"):
         if "job_duration_seconds_sum{" in line:
