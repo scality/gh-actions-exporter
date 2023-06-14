@@ -1,6 +1,6 @@
-
 from datetime import datetime
 from typing import Optional
+
 from pydantic import BaseModel
 
 
@@ -16,6 +16,7 @@ class Steps(BaseModel):
 class WorkflowJob(BaseModel):
     id: int
     run_id: int
+    workflow_name: str
     run_url: str
     run_attempt: int
     runner_name: Optional[str] = None

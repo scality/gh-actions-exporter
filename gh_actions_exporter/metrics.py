@@ -11,15 +11,15 @@ class Metrics(object):
     def __init__(self, settings: Settings):
         self.settings = settings
         self.cost = Cost(settings)
-        self.workflow_labelnames = [
+
+        self.common_labelnames = [
             "repository",
             "workflow_name",
             "repository_visibility",
         ]
-        self.job_labelnames = [
-            "repository",
+        self.workflow_labelnames = self.common_labelnames.copy()
+        self.job_labelnames = self.common_labelnames.copy() + [
             "job_name",
-            "repository_visibility",
             "runner_type",
         ]
         for relabel in self.settings.job_relabelling:
@@ -144,6 +144,7 @@ class Metrics(object):
             job_name=webhook.workflow_job.name,
             repository_visibility=webhook.repository.visibility,
             repository=webhook.repository.full_name,
+            workflow_name=webhook.workflow_job.workflow_name,
         )
 
         for relabel in settings.job_relabelling:
