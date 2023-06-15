@@ -98,7 +98,7 @@ cost = (cost_per_flavor + cost_per_storage) * 130 / 100
 
 _Good news, GCP and AWS costs are quite the same for the same flavors._
 
-### Les différents tags et leur coût associé
+### The different tags and their associated cost
 
 | Provider                           | Runner                      | Cost ($ per min)   |
 | ---------------------------------- | --------------------------- | ------------------ |
