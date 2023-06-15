@@ -40,6 +40,18 @@ theme:
 nav:
 - Home: index.md
 
+- Getting Started:
+  - Local Setup: getting-started/local-setup.md
+  - Run it Locally: getting-started/run-it-locally.md
+
+- Setting up graphs:
+  - Collected and reported metrics: setup/collected-reported-metrics.md
+  - Utilizing Grafana: setup/utilizing-grafana.md
+
+- Tags on runners' VMs:
+  - Google Cloud: tags/google-cloud.md
+  - AWS: tags/aws.md
+
 markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true

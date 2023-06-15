@@ -15,6 +15,9 @@ uvicorn = { extras = ["standard"], version = "^0.15.0" }
 python-multipart = "^0.0.5"
 PyYAML = "^6.0"
 githubkit = "^0.10.3"
+mkdocs = "^1.4.3"
+mkdocs-material = "^9.1.16"
+materialx = "^0.0.0.dev1"
 
 [tool.poetry.group.docs]
 optional = true
