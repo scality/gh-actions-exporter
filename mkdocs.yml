@@ -48,9 +48,7 @@ nav:
   - Collected and reported metrics: setup/collected-reported-metrics.md
   - Utilizing Grafana: setup/utilizing-grafana.md
 
-- Tags on runners' VMs:
-  - Google Cloud: tags/google-cloud.md
-  - AWS: tags/aws.md
+- Tags on runners' VMs: tags.md
 
 markdown_extensions:
   - pymdownx.highlight:

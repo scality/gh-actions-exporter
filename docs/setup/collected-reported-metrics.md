@@ -31,8 +31,8 @@ Count the number of workflows for each state:
 
 ## Workflow job
 
-Voici les différentes metrics recupérées par le projet GitHub Actions Exporter
-pour les workflows job.
+Here are the different metrics collected by the GitHub Actions
+Exporter project for workflows and jobs.
 
 The duration of a job in seconds: `github_actions_job_duration_seconds`.
 
@@ -72,7 +72,7 @@ of 0.008$/min, that's it. Easy!
 
 When it comes to the cost of self-hosted runners, it's a bit more complicated.
 
-Scality's self-hosted runners include Google Cloud Provider (GCP) and AWS.
+Self-hosted runners include Google Cloud Provider (GCP) and AWS.
 
 The cost can be found based on the machine type in the Management Console
 for AWS (when creating an EC2 instance) and on the
