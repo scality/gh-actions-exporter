@@ -1,5 +1,7 @@
 # Utilizing Grafana
 
+It is possible to visualize the data provided by `gh_actions_exporter` with Grafana.
+
 Grafana is a powerful open-source platform that allows users to visualize
 and monitor various metrics and data sources. In this guide, we will
 explore how to effectively use Grafana to monitor and analyze GitHub Actions.
