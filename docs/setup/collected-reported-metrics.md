@@ -101,17 +101,17 @@ _Good news, GCP and AWS costs are quite the same for the same flavors._
 
 ### The different tags and their associated cost
 
-| Provider                           | Runner                      | Cost ($ per min)   |
-| ---------------------------------- | --------------------------- | ------------------ |
-| GitHub                             | `ubuntu-latest`             | 0.008              |
-| GitHub                             | `ubuntu-18.04`              | 0.008              |
-| GitHub                             | `ubuntu-20.04`              | 0.008              |
-| GitHub                             | `ubuntu-22.04`              | 0.008              |
-| GitHub                             | `ubuntu-20.04-4core`        | 0.016              |
-| GitHub                             | `ubuntu-22.04-4core`        | 0.016              |
-| GitHub                             | `ubuntu-22.04-8core`        | 0.032              |
-| AWS                                | `t3.small`                  | 0.000625           |
-| GCP                                | `n2-standard-2`             | 0.0025             |
-| AWS                                | `t3.large`                  | 0.0025             |
-| GCP                                | `n2-standard-4`             | 0.005              |
-| GCP                                | `n2-standard-8`             | 0.01               |
+| Provider | Runner               | Cost ($ per min) |
+| -------- | -------------------- | ---------------- |
+| GitHub   | `ubuntu-latest`      | 0.008            |
+| GitHub   | `ubuntu-18.04`       | 0.008            |
+| GitHub   | `ubuntu-20.04`       | 0.008            |
+| GitHub   | `ubuntu-22.04`       | 0.008            |
+| GitHub   | `ubuntu-20.04-4core` | 0.016            |
+| GitHub   | `ubuntu-22.04-4core` | 0.016            |
+| GitHub   | `ubuntu-22.04-8core` | 0.032            |
+| AWS      | `t3.small`           | 0.000625         |
+| GCP      | `n2-standard-2`      | 0.0025           |
+| AWS      | `t3.large`           | 0.0025           |
+| GCP      | `n2-standard-4`      | 0.005            |
+| GCP      | `n2-standard-8`      | 0.01             |
