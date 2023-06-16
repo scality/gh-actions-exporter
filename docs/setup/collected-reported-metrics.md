@@ -56,7 +56,7 @@ ones. It allows us to determine the cost of our CI runs.
 
 To calculate this metric, we use the following formula:
 
-```
+```bash
 cost = duration (per second) / 60 * cost (per minute)
 ```
 
@@ -72,7 +72,8 @@ of 0.008$/min, that's it. Easy!
 
 When it comes to the cost of self-hosted runners, it's a bit more complicated.
 
-Self-hosted runners include Google Cloud Provider (GCP) and AWS.
+To calculate the costs of self-hosted runners, we can play the game of
+calculating for the main ones, namely AWS and Google Cloud Provider (GCP).
 
 The cost can be found based on the machine type in the Management Console
 for AWS (when creating an EC2 instance) and on the
@@ -92,7 +93,7 @@ We analyzed previous invoices and calculated the additional cost generated
 by bandwidth, which amounted to approximately 30% for each month.
 Consequently, we were able to approximate the cost using the following formula:
 
-```
+```bash
 cost = (cost_per_flavor + cost_per_storage) * 130 / 100
 ```
 
@@ -109,9 +110,8 @@ _Good news, GCP and AWS costs are quite the same for the same flavors._
 | GitHub                             | `ubuntu-20.04-4core`        | 0.016              |
 | GitHub                             | `ubuntu-22.04-4core`        | 0.016              |
 | GitHub                             | `ubuntu-22.04-8core`        | 0.032              |
-| AWS & GCP                          | `small`                     | 0.000625           |
-| AWS & GCP                          | `medium`                    | 0.00125            |
-| AWS & GCP                          | `large`                     | 0.0025             |
-| AWS & GCP                          | `xlarge`                    | 0.005              |
-| AWS & GCP                          | `3xlarge`                   | 0.01               |
-| GCP                                | `large-nested`              | 0.0025             |
+| AWS                                | `t3.small`                  | 0.000625           |
+| GCP                                | `n2-standard-2`             | 0.0025             |
+| AWS                                | `t3.large`                  | 0.0025             |
+| GCP                                | `n2-standard-4`             | 0.005              |
+| GCP                                | `n2-standard-8`             | 0.01               |
