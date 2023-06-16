@@ -4,12 +4,6 @@ Grafana is a powerful open-source platform that allows users to visualize
 and monitor various metrics and data sources. In this guide, we will
 explore how to effectively use Grafana to monitor and analyze GitHub Actions.
 
-Grafana can be accessed through
-[the following URL](https://mon.scality.net/grafana/d/WidbLgPnk/).
-Once logged in, you will find two distinct boards: "GitHub Actions Costs"
-and "GitHub Actions Monitoring." These boards provide valuable insights
-into cost monitoring and general information about GitHub Actions.
-
 ## As a user
 
 When accessing the Grafana URL, users can easily sort and filter the displayed
@@ -28,9 +22,8 @@ Note that additional variables may be added in the future to enhance the
 monitoring capabilities further.
 
 It is possible to test and display specific information easily by
-accessing the ["Explore" tab](https://mon.scality.net/grafana/explore)
-in Grafana. You will need to enter a query there, as explained in
-the "As a developer" section below.
+accessing the "Explore" tab in Grafana. You will need to enter a
+query there, as explained in the "As a developer" section below.
 
 ## As a developper
 
