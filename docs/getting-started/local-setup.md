@@ -14,5 +14,5 @@ documentation for proper installation instruction.
 ## Install dependencies
 
 ```shell
-$ poetry install
+poetry install
 ```

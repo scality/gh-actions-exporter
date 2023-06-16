@@ -32,7 +32,7 @@ For more information, you can visit the Ngrok [website](https://ngrok.com/downlo
 Once installed, you can run the following command to listen on port 8000
 of the machine and assign a public URL to it.
 
-```
+``` shell
 ngrok http 8000
 ```
 

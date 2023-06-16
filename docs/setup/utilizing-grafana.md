@@ -23,7 +23,6 @@ Available Sorting Options:
 - `repository_visibility`: Public or private
 - `job_name`: Name of the job
 - `runner_type`: GitHub or self-hosted
-- `cloud`: GCloud / AWS or GitHub
 
 Note that additional variables may be added in the future to enhance the
 monitoring capabilities further.
