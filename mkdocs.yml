@@ -44,9 +44,9 @@ nav:
       - Local Setup: getting-started/local-setup.md
       - Run it Locally: getting-started/run-it-locally.md
 
-  - Setting up graphs:
-      - Collected and reported metrics: setup/collected-reported-metrics.md
-      - Utilizing Grafana: setup/utilizing-grafana.md
+  - Metrics Analysis and Prometheus Monitoring for GitHub Actions:
+      - Collected and reported metrics: metrics-analysis-prometheus/collected-reported-metrics.md
+      - Prometheus Monitoring: metrics-analysis-prometheus/prometheus.md
 
 markdown_extensions:
   - pymdownx.highlight:
