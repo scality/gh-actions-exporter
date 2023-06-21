@@ -44,6 +44,8 @@ within a specified time range.
 5. The expression `> 0` filters the query results to only include
    repositories with a value greater than zero.
 
+<!-- trunk:ignore
+
 !!! info
 
       Using Grafana enhances the visualization of Prometheus data and
@@ -53,3 +55,5 @@ within a specified time range.
       (selected time range) when working with Prometheus data in Grafana. This
       integration enables efficient data exploration and analysis for better
       insights and decision-making.
+
+-->
