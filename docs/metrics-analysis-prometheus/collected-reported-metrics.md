@@ -1,16 +1,15 @@
 # Collected and reported metrics
 
-The idea behind this repository is to gather as much information as
-possible from the requests sent by GitHub via the Webhook.
-
 In first place, it is important to differentiate the `workflow_run`
-and the `workflow_job` API requests.
+and the `workflow_job` webhook events.
 
 The `workflow_run` request is triggered when a workflow run is `requested`,
-`in_progress`, or `completed`.
+`in_progress`, `completed` or `failure`. However, for this project, we are not
+interested in the `cancelled` or `skipped` events, so we will ignore them.
 
 On the other hand, the `workflow_job` request is triggered when a
-workflow job is `queued`, `in_progress`, or `completed`.
+workflow job is `queued`, `in_progress`, or `completed`. We will also ignore
+the `cancelled` or `skipped` events for `workflow_job` in this project.
 
 ## Workflow run
 
@@ -52,9 +51,9 @@ Count the number of jobs for each states:
 This is the last metric we collect, and it is one of the most important
 ones. It allows us to determine the cost of our CI runs.
 
-### The formula to calculate the cost over a period of time
+### Formula
 
-To calculate this metric, we use the following formula:
+Here is the formula to calculate the cost over a period of time:
 
 ```bash
 cost = duration (per second) / 60 * cost (per minute)
@@ -68,6 +67,11 @@ As for GitHub, it is quite simple. They provide us with a fixed value, and
 the price never varies. To give an example, for `ubuntu-latest`, we have a cost
 of 0.008$/min, that's it. Easy!
 
+For larger GitHub hosted runners, such as the high-performance options, the
+pricing structure may differ. The exact details and costs associated with those
+specific runner types can be obtained from
+[GitHub's documentation](https://docs.github.com/en/billing/managing-billing-for-github-actions/about-billing-for-github-actions).
+
 #### Self-Hosted
 
 When it comes to the cost of self-hosted runners, it's a bit more complicated.
@@ -80,24 +84,27 @@ for AWS (when creating an EC2 instance) and on the
 [Google Cloud website](https://cloud.google.com/compute/vm-instance-pricing)
 for GCP.
 
-Unfortunately, these values are not accurate as they lack several elements
-such as bandwidth or storage. As for storage costs, they can be found in
-the same places where the machine type cost is available. However, it is
-not possible to determine the bandwidth cost directly.
+We aim to obtain a result that is close to reality, within a range of
+approximately +/- 5%, for data visualization purposes.
+Key points to consider for retrieving cost information:
 
-To overcome this, we had to devise a workaround. We didn't necessarily
-need an exact cost for CI but rather a value close to reality (+/- 5%)
-for data visualization purposes.
+- RAM and CPU Costs : provided values for RAM and CPU expenses, can be found
+  in the Google Cloud documentation.
+- Storage Costs : provided values for storage expenses, can be found in the
+  Google Cloud documentation.
+- Bandwidth Cost: Directly determining the cost of bandwidth is not feasible.
 
-We analyzed previous invoices and calculated the additional cost generated
-by bandwidth, which amounted to approximately 30% for each month.
-Consequently, we were able to approximate the cost using the following formula:
+To arrive at an approximate cost, we conducted an analysis of previous invoices
+and calculated the additional expenses incurred due to bandwidth, which averaged
+around 30% per month. With this information, we were able to approximate the
+overall cost using the following formula:
 
 ```bash
 cost = (cost_per_flavor + cost_per_storage) * 130 / 100
 ```
 
-_Good news, GCP and AWS costs are quite the same for the same flavors._
+!!! note
+    GCP and AWS costs are quite the same for the same flavors.
 
 ### The different tags and their associated cost
 
@@ -115,3 +122,8 @@ _Good news, GCP and AWS costs are quite the same for the same flavors._
 | AWS      | `t3.large`           | 0.0025           |
 | GCP      | `n2-standard-4`      | 0.005            |
 | GCP      | `n2-standard-8`      | 0.01             |
+
+!!! note
+    Please note that the names of large GitHub hosted runners
+    may not be explicitly the same as shown below, but this is
+    the naming convention recommended by GitHub.
