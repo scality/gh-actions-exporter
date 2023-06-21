@@ -2,12 +2,12 @@
 
 ## Introduction
 
-In order to collect and analyze GitHub Actions metrics, users are expected
-to have an existing Prometheus installation and configure it to pull metrics.
-
 Prometheus is a powerful open-source monitoring and alerting system that allows
 users to collect, store, and analyze time-series data. In this guide, we will
 explore how to effectively utilize Prometheus to analyze GitHub Actions.
+
+In order to collect and analyze GitHub Actions metrics, users are expected
+to have an existing Prometheus installation and configure it to pull metrics.
 
 ## Understanding Prometheus Queries
 
@@ -39,14 +39,14 @@ within a specified time range.
    cumulative sum of the github_actions_job_cost_count_total metric,
    representing the total job cost count.
 3. The `[5m]` part specifies the time range for the query.
-4. The `by (repository)` clause groups the data by the repository field.
+4. The `by (repository)` clause groups the data by the repository label.
    This enables the query to calculate the cost sum for each repository individually.
 5. The expression `> 0` filters the query results to only include
    repositories with a value greater than zero.
 
 !!! info
-   You can also use Grafana, it enhances the visualization of Prometheus data and
-   provides powerful querying capabilities. Within Grafana, you can apply filters,
+   Using Grafana enhances the visualization of Prometheus data and
+   provides powerful querying capabilities. Within Grafana, apply filters,
    combine queries, and utilize variables for dynamic filtering. It's important
    to understand `__interval` (time interval between data points) and `__range`
    (selected time range) when working with Prometheus data in Grafana. This

@@ -88,19 +88,23 @@ We aim to obtain a result that is close to reality, within a range of
 approximately +/- 5%, for data visualization purposes.
 Key points to consider for retrieving cost information:
 
-- RAM and CPU Costs : provided values for RAM and CPU expenses, can be found
-  in the Google Cloud documentation.
-- Storage Costs : provided values for storage expenses, can be found in the
-  Google Cloud documentation.
-- Bandwidth Cost: Directly determining the cost of bandwidth is not feasible.
+- RAM and CPU Costs : provided cost per minute for RAM and CPU expenses, can
+  be found in the documentation of the respective cloud provider.
+- Storage Costs : provided cost per minute for storage expenses, can
+  be found in the documentation of the respective cloud provider.
+- Bandwidth Cost: Directly determining the cost per minute of bandwidth is
+  not feasible.
 
-To arrive at an approximate cost, we conducted an analysis of previous invoices
-and calculated the additional expenses incurred due to bandwidth, which averaged
-around 30% per month. With this information, we were able to approximate the
-overall cost using the following formula:
+Calculating the bandwidth cost per minutes is up to the discretion of the
+user and will vary depending on the workload. As an example, adding an
+extra 30% is what we found by comparing the values in the documentation
+of different cloud providers (for CPU, RAM, and storage) with the actual
+values available on our invoices. Using this information, we were able
+to estimate the overall cost using the following formula:
+(all costs are per minute)
 
 ```bash
-cost = (cost_per_flavor + cost_per_storage) * 130 / 100
+cost = (cost_per_flavor + cost_per_storage) * cost_of_bandwidth / 100
 ```
 
 !!! note
