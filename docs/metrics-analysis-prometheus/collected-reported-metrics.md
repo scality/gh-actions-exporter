@@ -84,9 +84,19 @@ for AWS (when creating an EC2 instance) and on the
 [Google Cloud website](https://cloud.google.com/compute/vm-instance-pricing)
 for GCP.
 
-We aim to obtain a result that is close to reality, within a range of
-approximately +/- 5%, for data visualization purposes.
 Key points to consider for retrieving cost information:
+
+!!! note "Cost for self-hosted runners are approximate"
+
+    When retrieving the cost of each key point,
+    calculating the exact cost per minute might not be possible
+    as it depends on the cloud provider billing policy
+    and each individual CI workload:
+
+    - Internal cloud provider/lab with dedicated hardware.
+    - Cloud provider billing policy for virtual machines is per hour or day only.
+    - Price of instance varies during the day, week or month.
+    - CI job that uploads a large amount of data.
 
 - RAM and CPU Costs : provided cost per minute for RAM and CPU expenses, can
   be found in the documentation of the respective cloud provider.
