@@ -1,10 +1,27 @@
-# Autoformatter friendly markdownlint config (all formatting rules disabled)
+---
 default: true
-blank_lines: false
-bullet: false
-html: false
-indentation: false
-line_length: false
-spaces: false
-url: false
-whitespace: false
+
+MD013:
+  # Include code blocks
+  code_blocks: false
+  # Include tables
+  tables: false
+
+MD033:
+  # Allowed elements
+  allowed_elements:
+    - p
+
+# to hard to support in mkdocs-material
+MD046: false
+
+# As url are handled by magiclink plugin
+# no need to keep ensuring that they are properly formatted
+MD034: false
+
+MD007:
+  # Indentation size
+  indent: 2
+
+MD026:
+  punctuation: ".,;!"
