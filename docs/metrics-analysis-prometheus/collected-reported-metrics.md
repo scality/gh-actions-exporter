@@ -99,8 +99,8 @@ Calculating the bandwidth cost per minutes is up to the discretion of the
 user and will vary depending on the workload. As an example, adding an
 extra 30% is what we found by comparing the values in the documentation
 of different cloud providers (for CPU, RAM, and storage) with the actual
-values available on our invoices. Using this information, we were able
-to estimate the overall cost using the following formula:
+values available on our invoices. Using this information,
+estimating the overall cost can be done using the following formula:
 (all costs are per minute)
 
 ```bash
