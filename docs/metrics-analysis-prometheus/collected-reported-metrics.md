@@ -107,13 +107,9 @@ to estimate the overall cost using the following formula:
 cost = (cost_per_flavor + cost_per_storage) * percentage_cost_of_bandwidth
 ```
 
-<!-- trunk:ignore
-
 !!! note
 
     GCP and AWS costs are quite the same for the same flavors.
-
--->
 
 ### The different tags and their associated cost
 
@@ -132,12 +128,8 @@ cost = (cost_per_flavor + cost_per_storage) * percentage_cost_of_bandwidth
 | GCP      | `n2-standard-4`      | 0.005            |
 | GCP      | `n2-standard-8`      | 0.01             |
 
-<!-- trunk:ignore
-
 !!! note
 
     Please note that the names of large GitHub hosted runners
     may not be explicitly the same as shown below, but this is
     the naming convention recommended by GitHub.
-
--->
