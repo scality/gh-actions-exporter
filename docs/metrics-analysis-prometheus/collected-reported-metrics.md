@@ -104,7 +104,7 @@ to estimate the overall cost using the following formula:
 (all costs are per minute)
 
 ```bash
-cost = (cost_per_flavor + cost_per_storage) * cost_of_bandwidth / 100
+cost = (cost_per_flavor + cost_per_storage) * percentage_cost_of_bandwidth
 ```
 
 <!-- trunk:ignore
