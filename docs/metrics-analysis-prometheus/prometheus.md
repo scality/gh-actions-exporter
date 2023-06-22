@@ -48,12 +48,12 @@ within a specified time range.
 
 !!! info
 
-      Using Grafana enhances the visualization of Prometheus data and
-      provides powerful querying capabilities. Within Grafana, apply filters,
-      combine queries, and utilize variables for dynamic filtering. It's important
-      to understand `__interval` (time interval between data points) and `__range`
-      (selected time range) when working with Prometheus data in Grafana. This
-      integration enables efficient data exploration and analysis for better
-      insights and decision-making.
+    Using Grafana enhances the visualization of Prometheus data and
+    provides powerful querying capabilities. Within Grafana, apply filters,
+    combine queries, and utilize variables for dynamic filtering. It's important
+    to understand `__interval` (time interval between data points) and `__range`
+    (selected time range) when working with Prometheus data in Grafana. This
+    integration enables efficient data exploration and analysis for better
+    insights and decision-making.
 
 -->
