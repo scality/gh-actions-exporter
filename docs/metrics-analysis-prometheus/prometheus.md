@@ -6,8 +6,9 @@ Prometheus is a powerful open-source monitoring and alerting system that allows
 users to collect, store, and analyze time-series data. In this guide, we will
 explore how to effectively utilize Prometheus to analyze GitHub Actions.
 
-In order to collect and analyze GitHub Actions metrics, users are expected
-to have an existing Prometheus installation and configure it to pull metrics.
+To collect and analyze GitHub Actions metrics, users need to have an existing
+Prometheus installation and configure it to pull metrics. This requires
+specifying the Prometheus URL with the `/metrics` path.
 
 ## Understanding Prometheus Queries
 
