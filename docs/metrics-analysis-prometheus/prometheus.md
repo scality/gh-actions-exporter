@@ -7,8 +7,8 @@ users to collect, store, and analyze time-series data. In this guide, we will
 explore how to effectively utilize Prometheus to analyze GitHub Actions.
 
 To collect and analyze GitHub Actions metrics, users need to have an existing
-Prometheus installation and configure it to pull metrics. This requires
-specifying the Prometheus URL with the `/metrics` path.
+Prometheus installation and configure it to pull metrics
+from the `/metrics` endpoint of the exporter.
 
 ## Understanding Prometheus Queries
 
