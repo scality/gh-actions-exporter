@@ -38,7 +38,15 @@ theme:
     code: Roboto Mono
 
 nav:
-- Home: index.md
+  - Home: index.md
+
+  - Getting Started:
+      - Local Setup: getting-started/local-setup.md
+      - Run it Locally: getting-started/run-it-locally.md
+
+  - Metrics Analysis and Prometheus Monitoring for GitHub Actions:
+      - Collected and reported metrics: metrics-analysis-prometheus/collected-reported-metrics.md
+      - Prometheus Monitoring: metrics-analysis-prometheus/prometheus.md
 
 markdown_extensions:
   - pymdownx.highlight:
