@@ -249,7 +249,7 @@ class Metrics(object):
         workflow_labels = self.workflow_labels_from_job(
             job_labels["workflow_name"],
             job_labels["repository"],
-            job_labels["repository_visibility"]
+            job_labels["repository_visibility"],
         )
         flavor = self.flavor_type(webhook)
         if webhook.workflow_job.conclusion:
@@ -258,10 +258,7 @@ class Metrics(object):
             job_cost_metric.inc(cost)
 
     def workflow_labels_from_job(
-        self,
-        workflow_name: str,
-        repository_full_name: str,
-        repository_visibility: str
+        self, workflow_name: str, repository_full_name: str, repository_visibility: str
     ) -> dict:
         return dict(
             workflow_name=workflow_name,

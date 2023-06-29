@@ -106,6 +106,7 @@ def test_job_cost(client, workflow_job, headers):
         if "github_actions_job_cost_count_total{" in line:
             assert "0.104" in line
 
+
 def test_workflow_cost(client, workflow_job, headers):
     metrics = client.get("/metrics")
     for line in metrics.text.split("\n"):
@@ -124,6 +125,7 @@ def test_workflow_cost(client, workflow_job, headers):
     for line in metrics.text.split("\n"):
         if "github_actions_workflow_cost_count_total{" in line:
             assert "0.208" in line
+
 
 def test_skipped_job(override_job_config, client, workflow_job, headers):
     workflow_job["workflow_job"]["runner_name"] = None
