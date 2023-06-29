@@ -82,6 +82,7 @@ async def clear(metrics: Metrics = Depends(metrics)):
     metrics.job_status_total.clear()
     metrics.job_start_duration.clear()
     metrics.job_cost.clear()
+    metrics.workflow_cost.clear()
 
 
 def start():

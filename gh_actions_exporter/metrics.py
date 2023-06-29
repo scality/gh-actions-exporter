@@ -106,6 +106,11 @@ class Metrics(object):
             "Cost of a job",
             labelnames=self.job_labelnames,
         )
+        self.workflow_cost = Counter(
+            "github_actions_workflow_cost_count",
+            "Cost of a workflow",
+            labelnames=self.workflow_labelnames,
+        )
 
     def workflow_labels(self, webhook: WebHook) -> dict:
         return dict(
@@ -238,3 +243,28 @@ class Metrics(object):
         if webhook.workflow_job.conclusion:
             cost = self.cost.get_job_cost(webhook.workflow_job, flavor)
             self.job_cost.labels(**labels).inc(cost)
+
+    def handle_workflow_cost(self, webhook: WebHook, settings: Settings):
+        job_labels = self.job_labels(webhook, settings)
+        workflow_labels = self.workflow_labels_from_job(
+            job_labels["workflow_name"],
+            job_labels["repository"],
+            job_labels["repository_visibility"]
+        )
+        flavor = self.flavor_type(webhook)
+        if webhook.workflow_job.conclusion:
+            cost = self.cost.get_job_cost(webhook.workflow_job, flavor)
+            job_cost_metric = self.workflow_cost.labels(**workflow_labels)
+            job_cost_metric.inc(cost)
+
+    def workflow_labels_from_job(
+        self,
+        workflow_name: str,
+        repository_full_name: str,
+        repository_visibility: str
+    ) -> dict:
+        return dict(
+            workflow_name=workflow_name,
+            repository=repository_full_name,
+            repository_visibility=repository_visibility,
+        )
