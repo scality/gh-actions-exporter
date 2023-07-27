@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: "registry.scality.com/gh-actions-exporter/gh-actions-exporter"
+  repository: "ghcr.io/scality/gh-actions-exporter"
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: "0.0.1-gamma"
