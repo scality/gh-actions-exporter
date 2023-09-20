@@ -25,7 +25,7 @@ mkdocs-material = "^9.1.6"
 mkdocs-multirepo-plugin = "^0.6.1"
 
 [tool.poetry.dev-dependencies]
-pytest = "^7.1.0"
+pytest = "^7.4.2"
 flake8 = "^4.0.1"
 requests = "^2.26.0"
 pytest-cov = "^3.0.0"
