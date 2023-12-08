@@ -21,8 +21,6 @@ def test_workflow_job_in_progress(client, workflow_job, headers):
     for line in metrics.text.split("\n"):
         if "inprogress_count_total{" in line:
             assert "1.0" in line
-        if "start_duration_seconds_sum{" in line:
-            assert "240.0" in line
 
 
 def test_workflow_job_label_self_hosted(client, workflow_job, headers):
@@ -57,8 +55,6 @@ def test_multiple_job_runs(client, workflow_job, headers):
             assert "780.0" in line
         if "job_total_count_total{" in line:
             assert "1.0" in line
-        if "job_start_duration_seconds_sum{" in line:
-            assert "240.0" in line
 
 
 def test_job_relabel(override_job_config, client, workflow_job, headers):
@@ -105,6 +101,21 @@ def test_job_cost(client, workflow_job, headers):
     for line in metrics.text.split("\n"):
         if "github_actions_job_cost_count_total{" in line:
             assert "0.104" in line
+
+
+def test_job_start_duration(client, workflow_job, headers):
+    response = client.post("/webhook", json=workflow_job, headers=headers)
+    assert response.status_code == 202
+
+    metrics = client.get("/metrics")
+    assert metrics.status_code == 200
+    line_found = False
+    for line in metrics.text.split("\n"):
+        if "github_actions_job_start_duration_seconds_sum{" in line:
+            print(line)
+            line_found = True
+            assert "360.0" in line
+    assert line_found is True
 
 
 def test_skipped_job(override_job_config, client, workflow_job, headers):

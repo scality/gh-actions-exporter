@@ -59,6 +59,7 @@ def workflow_job():
             "html_url": "https://github.com/scalanga-devl/fake",
             "status": "in_progress",
             "conclusion": None,
+            "created_at": "2021-11-29T14:40:57Z",
             "started_at": "2021-11-29T14:46:57Z",
             "completed_at": None,
             "name": "greet (tata)",
