@@ -7,7 +7,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Trunk Check
         uses: trunk-io/trunk-action@v1
   tests:
@@ -16,7 +16,7 @@ jobs:
       matrix:
         test: [unit, api]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: install poetry
         run: pip install poetry
       - uses: actions/setup-python@v4
