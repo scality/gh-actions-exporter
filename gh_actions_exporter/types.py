@@ -26,7 +26,8 @@ class WorkflowJob(BaseModel):
     html_url: str
     status: str
     conclusion: Optional[str] = None
-    started_at: datetime
+    created_at: datetime
+    started_at: Optional[datetime] = None
     completed_at: Optional[datetime] = None
     name: str
     labels: list[str]

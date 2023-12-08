@@ -220,11 +220,10 @@ class Metrics(object):
             duration = self._get_job_duration(webhook)
             self.job_duration.labels(**labels).observe(duration)
         elif webhook.workflow_job.status == "in_progress":
-            duration = (
-                webhook.workflow_job.steps[0].started_at.timestamp()
-                - webhook.workflow_job.started_at.timestamp()
+            job_start_duration = webhook.workflow_job.started_at.timestamp() - (
+                webhook.workflow_job.created_at.timestamp()
             )
-            self.job_start_duration.labels(**labels).observe(duration)
+            self.job_start_duration.labels(**labels).observe(job_start_duration)
 
     def flavor_type(self, webhook: WebHook) -> str or None:
         for label in webhook.workflow_job.labels:
