@@ -34,6 +34,15 @@ class WorkflowJob(BaseModel):
     steps: Optional[list[Steps]] = None
 
 
+class BasePullRequest(BaseModel):
+    ref: str
+
+
+class PullRequest(BaseModel):
+    number: int
+    base: BasePullRequest
+
+
 class WorkflowRun(BaseModel):
     id: int
     name: str
@@ -44,6 +53,7 @@ class WorkflowRun(BaseModel):
     workflow_id: int
     run_number: int
     head_branch: str
+    pull_requests: Optional[list[PullRequest]] = None
     created_at: datetime
     updated_at: Optional[datetime] = None
     run_attempt: int

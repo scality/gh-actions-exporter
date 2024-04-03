@@ -42,7 +42,7 @@ class Settings(BaseSettings):
         "ubuntu-20.04": 0.008,
     }
     default_cost: Optional[float] = 0
-
+    branches: List[str] = ["main", "master"]
     check_runs_enabled: bool = False
     github_app_id: Optional[int]
     github_app_installation_id: Optional[int]

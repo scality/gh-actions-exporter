@@ -34,6 +34,31 @@ def workflow_run():
             "created_at": "2021-11-16T17:52:47Z",
             "run_started_at": "2021-11-16T17:52:47Z",
             "updated_at": "2021-11-16T17:53:32Z",
+            "pull_requests": [
+                {
+                    "url": "https://api.github.com/repos/org/repo/pulls/555",
+                    "id": 1805247,
+                    "number": 555,
+                    "head": {
+                        "ref": "feature/my-feature",
+                        "sha": "fc98b69edf5ac3f4789c210e758b1ee4b4396b9e",
+                        "repo": {
+                            "id": 395065315,
+                            "url": "https://api.github.com/repos/org/repo",
+                            "name": "repo",
+                        },
+                    },
+                    "base": {
+                        "ref": "master",
+                        "sha": "966917b16d284edde596b0705a49f8c65ecf1c84",
+                        "repo": {
+                            "id": 395065125,
+                            "url": "https://api.github.com/repos/org/repo",
+                            "name": "repo",
+                        },
+                    },
+                }
+            ],
         },
         "repository": {
             "name": "repo",
