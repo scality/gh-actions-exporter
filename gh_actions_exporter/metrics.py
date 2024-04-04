@@ -1,10 +1,11 @@
+import fnmatch
 from typing import Dict, List
 
 from prometheus_client import Counter, Histogram
 
 from gh_actions_exporter.config import Relabel, RelabelType, Settings
 from gh_actions_exporter.cost import Cost
-from gh_actions_exporter.types import WebHook, WorkflowJob
+from gh_actions_exporter.types import WebHook, WorkflowJob, WorkflowRun
 
 
 class Metrics(object):
@@ -17,7 +18,10 @@ class Metrics(object):
             "workflow_name",
             "repository_visibility",
         ]
-        self.workflow_labelnames = self.common_labelnames.copy()
+        self.workflow_labelnames = self.common_labelnames.copy() + [
+            "branch",
+            "event",
+        ]
         self.job_labelnames = self.common_labelnames.copy() + [
             "job_name",
             "runner_type",
@@ -107,11 +111,42 @@ class Metrics(object):
             labelnames=self.job_labelnames,
         )
 
+    def retrieve_branch(self, workflow_run: WorkflowRun) -> str:
+        """
+        Add the branch label to the metrics exposed by the exporter while
+        also taking into account the cardinality limitations of prometheus:
+
+        - For workflows triggered on pull_request event
+          retrieve the base branch (target branch).
+
+        - For other events, retrieve the head branch.
+
+        Then check if the branch matches any of the patterns defined in
+        self.settings.branches like: development/*, main, feature/*, etc.
+
+        Return the branch name if it matches any of the patterns,
+        otherwise return "dev".
+        """
+        ref: str
+        if workflow_run.event == "pull_request":
+            assert workflow_run.pull_requests
+            ref = workflow_run.pull_requests[0].base.ref
+        else:
+            ref = workflow_run.head_branch
+        for branch in self.settings.branches:
+            if fnmatch.fnmatch(ref, branch):
+                return ref
+        return "dev"
+
     def workflow_labels(self, webhook: WebHook) -> dict:
+        assert webhook.workflow_run
+        branch = self.retrieve_branch(webhook.workflow_run)
         return dict(
             workflow_name=webhook.workflow_run.name,
             repository=webhook.repository.full_name,
             repository_visibility=webhook.repository.visibility,
+            branch=branch,
+            event=webhook.workflow_run.event,
         )
 
     def runner_type(self, webhook: WebHook) -> str:

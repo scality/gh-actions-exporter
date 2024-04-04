@@ -27,7 +27,9 @@ def job_relabel_config():
 
 @lru_cache()
 def default_settings():
-    return Settings()
+    return Settings(
+        branches=["main", "master", "development/*"],
+    )
 
 
 @lru_cache()
