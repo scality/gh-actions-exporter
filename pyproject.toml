@@ -27,7 +27,7 @@ mkdocs-multirepo-plugin = "^0.6.1"
 [tool.poetry.dev-dependencies]
 pytest = "^7.4.4"
 flake8 = "^7.0.0"
-requests = "^2.26.0"
+requests = "^2.32.0"
 pytest-cov = "^4.1.0"
 
 [build-system]
