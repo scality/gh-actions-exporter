@@ -380,25 +380,26 @@ dev = ["flake8", "markdown", "twine", "wheel"]
 
 [[package]]
 name = "githubkit"
-version = "0.10.7"
+version = "0.11.5"
 description = "GitHub SDK for Python"
 optional = false
-python-versions = ">=3.8,<4.0"
+python-versions = "<4.0,>=3.8"
 files = [
-    {file = "githubkit-0.10.7-py3-none-any.whl", hash = "sha256:c3993e7b79e719e4cace328310e87108c6ea7eacdc9ea94ea00aebd6a856abeb"},
-    {file = "githubkit-0.10.7.tar.gz", hash = "sha256:b0a8a42feefad6604fee3faaba01ca0d0d215574f9d4557c1586c1dd926dc1e0"},
+    {file = "githubkit-0.11.5-py3-none-any.whl", hash = "sha256:c87eaaa9142b0ba1285ce4a7bce5e5c1a93d359fbb756489e79eb4fa7b26b520"},
+    {file = "githubkit-0.11.5.tar.gz", hash = "sha256:3557e4a82bf6e7ae3d4cba19b08237972c3601d6d78bc026b583ed1a3209f210"},
 ]
 
 [package.dependencies]
+hishel = ">=0.0.21,<=0.0.26"
 httpx = ">=0.23.0,<1.0.0"
-pydantic = ">=1.9.1,<2.0.0"
+pydantic = ">=1.9.1,<2.5.0 || >2.5.0,<2.5.1 || >2.5.1,<3.0.0"
 typing-extensions = ">=4.3.0,<5.0.0"
 
 [package.extras]
-all = ["PyJWT[crypto] (>=2.4.0,<3.0.0)", "anyio (>=3.6.1,<4.0.0)"]
-auth = ["PyJWT[crypto] (>=2.4.0,<3.0.0)", "anyio (>=3.6.1,<4.0.0)"]
+all = ["PyJWT[crypto] (>=2.4.0,<3.0.0)", "anyio (>=3.6.1,<5.0.0)"]
+auth = ["PyJWT[crypto] (>=2.4.0,<3.0.0)", "anyio (>=3.6.1,<5.0.0)"]
 auth-app = ["PyJWT[crypto] (>=2.4.0,<3.0.0)"]
-auth-oauth-device = ["anyio (>=3.6.1,<4.0.0)"]
+auth-oauth-device = ["anyio (>=3.6.1,<5.0.0)"]
 jwt = ["PyJWT[crypto] (>=2.4.0,<3.0.0)"]
 
 [[package]]
@@ -411,6 +412,27 @@ files = [
     {file = "h11-0.14.0-py3-none-any.whl", hash = "sha256:e3fe4ac4b851c468cc8363d500db52c2ead036020723024a109d37346efaa761"},
     {file = "h11-0.14.0.tar.gz", hash = "sha256:8f19fbbe99e72420ff35c00b27a34cb9937e902a8b810e2c88300c6f0a3b699d"},
 ]
+
+[[package]]
+name = "hishel"
+version = "0.0.26"
+description = "Persistent cache implementation for httpx and httpcore"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "hishel-0.0.26-py3-none-any.whl", hash = "sha256:63cd3fee495124e0ed3461b374c43eab3e9deb2f01ba72eafe36d7df5fcf8b46"},
+    {file = "hishel-0.0.26.tar.gz", hash = "sha256:f0ae2766214499cb0253a5ec7694f0d6e3835c9a35634356f8926fb7a1cf379e"},
+]
+
+[package.dependencies]
+httpx = ">=0.22.0"
+typing-extensions = ">=4.8.0"
+
+[package.extras]
+redis = ["redis (==5.0.1)"]
+s3 = ["boto3 (>=1.15.0,<=1.15.3)", "boto3 (>=1.15.3)"]
+sqlite = ["anysqlite (>=0.0.5)"]
+yaml = ["pyyaml (==6.0.1)"]
 
 [[package]]
 name = "httpcore"
@@ -1870,4 +1892,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "60be4fe64cf71b8a2800cc426fec05f663e34c7c71de54e34c057f7b1e25b8eb"
+content-hash = "67c6a6c1e26146ce0d696dd4b76cbaaeb838d42a5b479b95445f54799189fdd9"
