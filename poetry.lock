@@ -780,13 +780,13 @@ files = [
 
 [[package]]
 name = "mkdocs-multirepo-plugin"
-version = "0.6.3"
+version = "0.8.0"
 description = "Build documentation in multiple repos into one site."
 optional = false
 python-versions = "*"
 files = [
-    {file = "mkdocs_multirepo_plugin-0.6.3-py2.py3-none-any.whl", hash = "sha256:9a5052d8da8b7dff0c600583004af64ff434cef690b414ec1fe183ddc7735ca3"},
-    {file = "mkdocs_multirepo_plugin-0.6.3.tar.gz", hash = "sha256:6271cf0cbdbbdc4498c7786b4349fdec367dc889a40326d04c2244db0891ef26"},
+    {file = "mkdocs_multirepo_plugin-0.8.0-py2.py3-none-any.whl", hash = "sha256:7bda3c516cdf809aec2c93046e95c19cabfacb5a3de306ccfb40c9fc6179bfc9"},
+    {file = "mkdocs_multirepo_plugin-0.8.0.tar.gz", hash = "sha256:85c247299c010b2770245eeb00f7ea35d01d3d16370321f5970dffbac91bb11a"},
 ]
 
 [package.dependencies]
@@ -1870,4 +1870,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "60be4fe64cf71b8a2800cc426fec05f663e34c7c71de54e34c057f7b1e25b8eb"
+content-hash = "206f5a6c3fa2df14f1aaba449b66a2b49034e0f4e1910671477bcc844a72f0ac"
