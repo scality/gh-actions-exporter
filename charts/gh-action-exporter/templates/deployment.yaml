@@ -45,7 +45,7 @@ spec:
               port: {{ .Values.service.portName }}
           readinessProbe:
             httpGet:
-              path: /
+              path: /metrics/
               port: {{ .Values.service.portName }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
