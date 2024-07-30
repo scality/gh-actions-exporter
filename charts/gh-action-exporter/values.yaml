@@ -44,6 +44,7 @@ securityContext:
 service:
   type: ClusterIP
   port: 8000
+  portName: http
 
 ingress:
   enabled: true

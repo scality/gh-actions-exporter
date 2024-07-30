@@ -7,7 +7,7 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   ports:
-    - name: {{ include "gh-action-exporter.fullname" . }}
+    - name: {{ .Values.service.portName }}
       port: {{ .Values.service.port }}
       targetPort: 8000
       protocol: TCP

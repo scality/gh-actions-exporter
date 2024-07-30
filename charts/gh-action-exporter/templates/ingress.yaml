@@ -28,7 +28,7 @@ spec:
                 service:
                   name: {{ include "gh-action-exporter.fullname" . }}
                   port:
-                    number: {{ $.Values.service.port }}
+                    name: {{ .Values.service.portName }}
   {{- if .Values.ingress.tls }}
   tls:
     - hosts:
