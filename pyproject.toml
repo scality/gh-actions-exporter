@@ -20,7 +20,7 @@ githubkit = "^0.10.3"
 optional = true
 
 [tool.poetry.group.docs.dependencies]
-mkdocs = "^1.6.0"
+mkdocs = "^1.6.1"
 mkdocs-material = "^9.5.33"
 mkdocs-multirepo-plugin = "^0.8.3"
 
