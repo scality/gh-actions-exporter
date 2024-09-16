@@ -14,7 +14,7 @@ prometheus-client = "^0.20.0"
 uvicorn = { extras = ["standard"], version = "^0.30.6" }
 python-multipart = "^0.0.9"
 PyYAML = "^6.0"
-githubkit = "^0.10.3"
+githubkit = "^0.11.10"
 
 [tool.poetry.group.docs]
 optional = true
