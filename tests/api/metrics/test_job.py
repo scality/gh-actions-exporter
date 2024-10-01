@@ -125,3 +125,20 @@ def test_skipped_job(override_job_config, client, workflow_job, headers):
     workflow_job["workflow_job"]["completed_at"] = "2021-11-29T14:59:57Z"
     response = client.post("/webhook", json=workflow_job, headers=headers)
     assert response.status_code == 202
+
+@pytest.mark.parametrize("labels,expected_runner_type", [
+        (["warp-ubuntu-latest-x64-2x"], "self-hosted"),
+        (["self-hosted","linux"], "self-hosted"),
+        (["ubuntu-latest"], "github-hosted")
+    ])
+def test_runner_type_and_labels(client, workflow_job, headers, labels, expected_runner_type):
+    workflow_job["workflow_job"]["labels"] = labels
+    response = client.post("/webhook", json=workflow_job, headers=headers)
+    assert response.status_code == 202
+
+    metrics = client.get("/metrics")
+    assert metrics.status_code == 200
+
+    for line in metrics.text.split("\n"):
+        if "github_actions_job_start_duration_seconds_bucket{" in line:
+            assert "runner_labels=\"%s\",runner_type=\"%s\"" % (','.join(labels), expected_runner_type) in line

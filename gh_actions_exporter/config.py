@@ -47,6 +47,20 @@ class Settings(BaseSettings):
     github_app_id: Optional[int]
     github_app_installation_id: Optional[int]
     github_app_private_key: Optional[SecretStr]
+    github_hosted_runner_labels: Optional[List[str]] = [
+        "ubuntu-latest",
+        "ubuntu-24.04",
+        "ubuntu-22.04",
+        "ubuntu-20.04",
+        "windows-latest",
+        "windows-2022",
+        "windows-2019",
+        "macos-latest",
+        "macos-14",
+        "macos-13",
+        "macos-12",
+        "macos-11"
+    ]
 
     class Config:
         config: ConfigFile = ConfigFile()
