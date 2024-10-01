@@ -11,40 +11,13 @@ updates:
     directory: /
     schedule:
       interval: weekly
-    commit-message:
-      prefix: github-actions
-      include: scope
-    labels:
-      - github-actions
-      - dependencies
-
   - package-ecosystem: pip
     directory: /
     schedule:
       interval: weekly
-    commit-message:
-      prefix: pip
-      include: scope
-    labels:
-      - pip
-      - dependencies
-
   - package-ecosystem: docker
     registries:
       - dockerhub
     directory: /
     schedule:
       interval: weekly
-    commit-message:
-      prefix: docker
-      include: scope
-    labels:
-      - docker
-      - dependencies
-    groups:
-      docker:
-        patterns:
-          - "*"
-        update-types:
-          - patch
-          - minor
