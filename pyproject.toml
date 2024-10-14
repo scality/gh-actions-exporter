@@ -11,7 +11,7 @@ start = "gh_actions_exporter.main:start"
 python = "^3.9"
 fastapi = "^0.112.2"
 prometheus-client = "^0.20.0"
-uvicorn = { extras = ["standard"], version = "^0.30.6" }
+uvicorn = { extras = ["standard"], version = "^0.31.1" }
 python-multipart = "^0.0.9"
 PyYAML = "^6.0"
 githubkit = "^0.10.3"
