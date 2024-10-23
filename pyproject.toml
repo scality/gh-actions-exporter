@@ -10,7 +10,7 @@ start = "gh_actions_exporter.main:start"
 [tool.poetry.dependencies]
 python = "^3.9"
 fastapi = "^0.115.2"
-prometheus-client = "^0.20.0"
+prometheus-client = "^0.21.0"
 uvicorn = { extras = ["standard"], version = "^0.32.0" }
 python-multipart = "^0.0.12"
 PyYAML = "^6.0"
