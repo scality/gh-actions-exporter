@@ -21,7 +21,7 @@ optional = true
 
 [tool.poetry.group.docs.dependencies]
 mkdocs = "^1.6.1"
-mkdocs-material = "^9.5.43"
+mkdocs-material = "^9.5.45"
 mkdocs-multirepo-plugin = "^0.8.3"
 
 [tool.poetry.dev-dependencies]
