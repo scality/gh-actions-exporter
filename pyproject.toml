@@ -12,7 +12,7 @@ python = "^3.9"
 fastapi = "^0.115.5"
 prometheus-client = "^0.21.0"
 uvicorn = { extras = ["standard"], version = "^0.32.1" }
-python-multipart = "^0.0.17"
+python-multipart = "^0.0.18"
 PyYAML = "^6.0"
 githubkit = "^0.10.3"
 
