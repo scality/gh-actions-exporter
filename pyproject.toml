@@ -2,6 +2,7 @@
 name = "gh-actions-exporter"
 version = "0.1.0"
 description = ""
+license = "Apache-2.0"
 authors = ["Release Engineering <release.engineering@scality.com>"]
 
 [tool.poetry.scripts]
