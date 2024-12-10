@@ -25,6 +25,7 @@ class Metrics(object):
         self.job_labelnames = self.common_labelnames.copy() + [
             "job_name",
             "runner_type",
+            "runner_labels",
         ]
         for relabel in self.settings.job_relabelling:
             self.job_labelnames.append(relabel.label)
@@ -148,11 +149,14 @@ class Metrics(object):
             branch=branch,
             event=webhook.workflow_run.event,
         )
-
+    
     def runner_type(self, webhook: WebHook) -> str:
-        if "self-hosted" in webhook.workflow_job.labels:
-            return "self-hosted"
-        return "github-hosted"
+        if set(webhook.workflow_job.labels) <= set(self.settings.github_hosted_runner_labels):
+            return "github-hosted"
+        return "self-hosted"
+    
+    def runner_labels(self, webhook: WebHook) -> str:
+        return ','.join(webhook.workflow_job.labels)
 
     def relabel_job_labels(
         self, relabel: Relabel, labels: List[str]
@@ -180,6 +184,7 @@ class Metrics(object):
             repository_visibility=webhook.repository.visibility,
             repository=webhook.repository.full_name,
             workflow_name=webhook.workflow_job.workflow_name,
+            runner_labels=self.runner_labels(webhook),
         )
 
         for relabel in settings.job_relabelling:
